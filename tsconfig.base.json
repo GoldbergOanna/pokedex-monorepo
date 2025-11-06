@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM"],
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+
+    // Enforce TypeScript practices
+    "strict": true,
+    "noImplicitAny": true,
+
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "useUnknownInCatchVariables": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Enable importing JSON files for Pokedex data and ensures each file is standalone-checkable.
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    "noEmit": true,
+    "baseUrl": ".",
+
+    // Allows clean import paths
+    "paths": {
+      "@pokedex/shared-types/*": ["libs/shared-types/src/*"]
+    },
+
+    "skipLibCheck": true
+  }
+}
