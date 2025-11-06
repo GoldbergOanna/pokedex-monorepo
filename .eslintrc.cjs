@@ -9,7 +9,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
   ],
-  env: { node: true, browser: true, es6: true },
+  env: { node: true, browser: true, es2022: true },
   ignorepatterns: ["dist", "node_modules"],
   rules: {
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
