@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: pokedex_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pokedex
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./apps/backend
+    container_name: pokedex_backend
+    restart: always
+    command: pnpm run dev
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./apps/backend/.env
+    depends_on:
+      - db
+    volumes:
+      - ./apps/backend:/app
+      - /app/node_modules
+    working_dir: /app
+
+  frontend:
+    build:
+      context: ./apps/frontend
+    container_name: pokedex_frontend
+    restart: always
+    command: pnpm run start
+    ports:
+      - '4200:4200'
+    depends_on:
+      - backend
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+    working_dir: /app
+
+volumes:
+  pg_data:
