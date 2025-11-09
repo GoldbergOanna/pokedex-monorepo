@@ -5,43 +5,9 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
   position: relative;
   overflow: hidden;
-
-  // Pokeball background decoration
-  &::before {
-    content: "";
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent 70%
-    );
-    top: -150px;
-    right: -150px;
-    animation: float 6s ease-in-out infinite;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(255, 255, 255, 0.08) 0%,
-      transparent 70%
-    );
-    bottom: -100px;
-    left: -100px;
-    animation: float 8s ease-in-out infinite reverse;
-  }
+  padding: 2rem;
 }
 
 .title {
@@ -64,43 +30,7 @@
   max-width: 400px;
   position: relative;
   z-index: 1;
-
-  // Pokeball accent on form
-  &::before {
-    content: "";
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(
-      to bottom,
-      #ee1515 0%,
-      #ee1515 45%,
-      #222 45%,
-      #222 55%,
-      #fff 55%,
-      #fff 100%
-    );
-    border-radius: 50%;
-    border: 4px solid #222;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 16px;
-    height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    border: 3px solid #222;
-    z-index: 2;
-  }
+  border-top: 4px solid #667eea;
 
   label {
     display: block;
@@ -173,16 +103,6 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-20px) rotate(5deg);
   }
 }
 
