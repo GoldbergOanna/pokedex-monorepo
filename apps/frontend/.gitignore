@@ -1,0 +1,42 @@
+# compiled output
+dist/
+out-tsc/
+build/
+
+# environment files
+.env
+.env.*
+!.env.example
+
+# system files
+.DS_Store
+Thumbs.db
+
+# Angular cache
+.angular/
+.angular/cache/
+
+# editor folders
+.vscode/
+.idea/
+*.swp
+
+# npm / pnpm logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+package-lock.json
+
+
+# node_modules
+node_modules/
+
+# test coverage output
+coverage/
+coverage-final.json
+
+# temporary build/test files
+tmp/
+temp/
