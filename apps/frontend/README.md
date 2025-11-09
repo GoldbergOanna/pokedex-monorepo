@@ -116,16 +116,6 @@ bash
 API_URL=http://localhost:3000
 Used in environment.ts for all HTTP communication.
 
-🧩 Future Improvements
-Complete AuthService + Refresh Token flow
-
-Integrate custom reusable paginator component across features
-
-Add local caching layer for Pokémon pages
-
-Configure Jest + Angular Testing Library for unit tests
-
-Implement dark mode and improve accessibility
 
 🧱 Summary
 A clean, reactive, and maintainable Angular 19 SPA featuring:
