@@ -1,42 +1,39 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import type { RequestOptions } from '../auth.types';
+import { tap, catchError, of } from 'rxjs';
+import { ApiService } from '@core/api/api.service';
+import type { LoginResponse } from '@core/core.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly http = inject(HttpClient);
-  private readonly baseurl = 'http://localhost:3000';
+  private readonly api = inject(ApiService);
 
-  //Helpers
+  //auth signals
+  private readonly _isAuthenticated = signal<string | null>(
+    localStorage.getItem('accessToken'),
+  );
+  readonly isAuthenticated = computed(() => !!this._isAuthenticated());
 
-  //GET
-  get<T>(endpoint: string, options?: RequestOptions): Observable<T> {
-    return this.http.get<T>(`${this.baseurl}/${endpoint}`, options);
+  login(email: string, password: string) {
+    return this.api.post<LoginResponse>('auth/login', { email, password }).pipe(
+      tap(({ accessToken }) => {
+        this._isAuthenticated.set(accessToken);
+        localStorage.setItem('accessToken', accessToken);
+      }),
+      catchError((error) => {
+        console.error('Login failed', error);
+        return of(null);
+      }),
+    );
   }
 
-  //POST
-  post<T, B extends object>(
-    endpoint: string,
-    body: B,
-    options?: RequestOptions,
-  ): Observable<T> {
-    return this.http.post<T>(`${this.baseurl}/${endpoint}`, body, options);
+  logout() {
+    this._isAuthenticated.set(null);
+    localStorage.removeItem('accessToken');
   }
 
-  //PUT
-  put<T, B extends object>(
-    endpoint: string,
-    body: B,
-    options?: RequestOptions,
-  ): Observable<T> {
-    return this.http.put<T>(`${this.baseurl}/${endpoint}`, body, options);
-  }
-
-  //DELETE
-  delete<T>(endpoint: string, options?: RequestOptions): Observable<T> {
-    return this.http.delete<T>(`${this.baseurl}/${endpoint}`, options);
+  getAccessToken(): string | null {
+    return this._isAuthenticated();
   }
 }
