@@ -13,6 +13,7 @@ export class AuthService {
   private readonly _isAuthenticated = signal<string | null>(
     localStorage.getItem('accessToken'),
   );
+
   readonly isAuthenticated = computed(() => !!this._isAuthenticated());
 
   login(email: string, password: string) {
