@@ -1,4 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": ["apps/**/*", "libs/**/*", "eslint.config.js"]
+  "include": [
+    "apps/**/*",
+    "libs/**/*",
+    "eslint.config.js",
+    "jest.config.js",
+    "libs/shared-types/jest.config.js"
+  ]
 }
