@@ -35,5 +35,9 @@
     "*.json": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "@angular/animations": "^19.2.15",
+    "@angular/platform-browser": "^19.2.15"
   }
 }

@@ -3,6 +3,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
+    "noEmit": false,
     "types": [],
     "strict": true,
     "noImplicitOverride": true,
@@ -20,12 +21,12 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "lib": ["ES2022", "DOM"],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@environments/*": ["environments/*"],
-      "@core/*": ["app/core/*"],
-      "@shared/*": ["app/shared/*"],
-      "@features/*": ["app/features/*"]
+      "@environments/*": ["src/environments/*"],
+      "@core/*": ["src/app/core/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@pages/*": ["src/app/pages/*"]
     }
   },
   "angularCompilerOptions": {
@@ -33,7 +34,5 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  },
-  "files": [],
-  "include": ["src/**/*.ts"]
+  }
 }
