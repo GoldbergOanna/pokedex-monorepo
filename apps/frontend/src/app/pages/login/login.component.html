@@ -1,10 +1,33 @@
 <div class="login-container">
   <h2 class="title">Hello there! Welcome to the world of pokémon!</h2>
+  <h3 class="title">{{ title() }}</h3>
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
     <div class="pokeball-icon">
       <div class="pokeball-inner"></div>
     </div>
+
+    @if (mode() === "register") {
+      <label>
+        Name
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="Enter your name"
+        />
+      </label>
+
+      @if (name.invalid && (name.dirty || name.touched)) {
+        <span class="error">
+          @if (name.errors?.["required"]) {
+            <div>Name is required.</div>
+          }
+          @if (name.errors?.["minlength"]) {
+            <div>Must be at least 2 characters long.</div>
+          }
+        </span>
+      }
+    }
 
     <label
       >Email
@@ -38,7 +61,29 @@
     }
 
     <button type="submit" [disabled]="loading() || loginForm.invalid">
-      {{ loading() ? "Logging in.." : "Login" }}
+      {{
+        loading()
+          ? mode() === "login"
+            ? "Logging in…"
+            : "Registering…"
+          : mode() === "login"
+            ? "Login"
+            : "Register"
+      }}
     </button>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <div class="toggle-mode">
+      @if (mode() === "login") {
+        Don’t have an account?
+        <a (click)="toggleMode()">Register here</a>
+      } @else {
+        Already a trainer?
+        <a (click)="toggleMode()">Login here</a>
+      }
+    </div>
   </form>
 </div>

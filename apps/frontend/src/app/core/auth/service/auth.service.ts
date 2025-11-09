@@ -29,6 +29,23 @@ export class AuthService {
     );
   }
 
+  register(name: string, email: string, password: string) {
+    return this.api
+      .post<LoginResponse>('auth/register', { name, email, password })
+      .pipe(
+        tap(({ accessToken }) => {
+          if (accessToken) {
+            this._isAuthenticated.set(accessToken);
+            localStorage.setItem('accessToken', accessToken);
+          }
+        }),
+        catchError((error) => {
+          console.error('Registration failed', error);
+          return of(null);
+        }),
+      );
+  }
+
   logout() {
     this._isAuthenticated.set(null);
     localStorage.removeItem('accessToken');
