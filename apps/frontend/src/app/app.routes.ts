@@ -9,6 +9,11 @@ export const routes: Routes = [
       import('@pages/login/login.component').then((m) => m.LoginComponent),
   },
   {
+    path: 'register',
+    loadComponent: () =>
+      import('@pages/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
     path: 'pokedex',
     canActivate: [() => inject(AuthGuard).canActivate()],
     loadComponent: () =>

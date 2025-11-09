@@ -17,12 +17,14 @@
         />
       </label>
 
-      @if (name.invalid && (name.dirty || name.touched)) {
+      @if (
+        controls.name.invalid && (controls.name.dirty || controls.name.touched)
+      ) {
         <span class="error">
-          @if (name.errors?.["required"]) {
+          @if (controls.name.errors?.["required"]) {
             <div>Name is required.</div>
           }
-          @if (name.errors?.["minlength"]) {
+          @if (controls.name.errors?.["minlength"]) {
             <div>Must be at least 2 characters long.</div>
           }
         </span>
@@ -37,12 +39,14 @@
         placeholder="Enter your email"
       />
     </label>
-    @if (email.invalid && (email.dirty || email.touched)) {
+    @if (
+      controls.email.invalid && (controls.email.dirty || controls.email.touched)
+    ) {
       <span class="error">
-        @if (email.errors?.["required"]) {
+        @if (controls.email.errors?.["required"]) {
           <div>Email is required.</div>
         }
-        @if (email.errors?.["email"]) {
+        @if (controls.email.errors?.["email"]) {
           <div>Please enter a valid email address.</div>
         }
       </span>
@@ -56,7 +60,7 @@
         placeholder="Enter your password"
       />
     </label>
-    @if (password.invalid && password.touched) {
+    @if (controls.password.invalid && controls.password.touched) {
       <div class="error">Min 6 characters required.</div>
     }
 
