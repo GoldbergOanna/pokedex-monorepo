@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { TestBed } from '@angular/core/testing';
 import { ApiService } from './api.service';
 import { HttpClient } from '@angular/common/http';
