@@ -1,1 +1,40 @@
-<p>login works!</p>
+<div class="login-container">
+  <h2 class="title">Hello there! Welcome to the world of pokémon!</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <label
+      >Email
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="Enter your email"
+      />
+    </label>
+    @if (email.invalid && (email.dirty || email.touched)) {
+      <span class="error">
+        @if (email.errors?.["required"]) {
+          <div>Email is required.</div>
+        }
+        @if (email.errors?.["email"]) {
+          <div>Please enter a valid email address.</div>
+        }
+      </span>
+    }
+
+    <label
+      >Password
+      <input
+        type="password"
+        formControlName="password"
+        placeholder="Enter your password"
+      />
+    </label>
+    @if (password.invalid && password.touched) {
+      <div class="error">Min 6 characters required.</div>
+    }
+
+    <button type="submit" [disabled]="loading() || loginForm.invalid">
+      {{ loading() ? "Logging in.." : "Login" }}
+    </button>
+  </form>
+</div>
