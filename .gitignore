@@ -1,8 +1,12 @@
 # === Node & Package Manager ===
 node_modules/
+dist/
+build/
+coverage/
 .pnpm-store/
 .pnp.cjs
 .pnp.loader.mjs
+
 
 # === Build outputs ===
 dist/
@@ -18,10 +22,7 @@ lerna-debug.log*
 
 # === Environment & local config ===
 .env
-.env.local
-.env.development
-.env.test
-.env.production
+.env.*
 
 # === Editor & system files ===
 .DS_Store

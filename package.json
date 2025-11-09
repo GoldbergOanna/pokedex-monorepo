@@ -2,6 +2,7 @@
   "name": "pokedex",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "description": "Full-stack Pokédex monorepo (Angular + Hono + PostgreSQL)",
   "scripts": {
     "dev:backend": "pnpm --filter @pokedex/backend dev",
