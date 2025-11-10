@@ -4,8 +4,8 @@ import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 
-import { authRoutes } from "./routes/auth.js";
-import { pokedexRoutes } from "./routes/pokedex.js";
+import { authRoutes } from "./routes/auth.ts";
+import { pokedexRoutes } from "./routes/pokedex.ts";
 
 const app = new Hono();
 

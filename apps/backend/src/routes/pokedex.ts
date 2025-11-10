@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { dbPool } from "../db.js";
+import { dbPool } from "../db.ts";
 import { z } from "zod";
-import { authMiddleware } from "../middleware/auth.middleware.js";
+import { authMiddleware } from "../middleware/auth.middleware.ts";
 
 export const pokedexRoutes = new Hono();
 
