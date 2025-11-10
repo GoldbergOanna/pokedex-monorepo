@@ -27,7 +27,7 @@ A full-stack TypeScript monorepo application for browsing and collecting Pokémo
 ✅ **Pokémon Browsing**
 - Paginated list of all Pokémon (20 per page)
 - Search by name
-- Filter by type, evolution tier, and description
+- Filter by type and name
 - Click to view detailed information
 - High-quality images and stats display
 
