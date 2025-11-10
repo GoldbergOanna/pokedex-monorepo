@@ -45,8 +45,18 @@ pokedexRoutes.get("/", async (c) => {
     const total = Number(countRes.rows[0].count);
     const totalPages = Math.ceil(total / limit);
 
+    // Transform data to extract hires image from image object
+    const transformedData = pokemonRes.rows.map((pokemon) => ({
+      ...pokemon,
+      image: pokemon.image?.hires || null,
+      name: pokemon.name?.english || pokemon.name,
+      type: Array.isArray(pokemon.type)
+        ? pokemon.type.join(", ")
+        : pokemon.type,
+    }));
+
     return c.json({
-      data: pokemonRes.rows,
+      data: transformedData,
       page,
       totalPages,
       totalCount: total,
@@ -70,7 +80,19 @@ pokedexRoutes.get("/:id", async (c) => {
       return c.json({ error: "Pokémon not found" }, 404);
     }
 
-    return c.json(pokemonRes.rows[0]);
+    const pokemon = pokemonRes.rows[0];
+
+    // Transform data to extract hires image from image object
+    const transformedPokemon = {
+      ...pokemon,
+      image: pokemon.image?.hires || null,
+      name: pokemon.name?.english || pokemon.name,
+      type: Array.isArray(pokemon.type)
+        ? pokemon.type.join(", ")
+        : pokemon.type,
+    };
+
+    return c.json(transformedPokemon);
   } catch (error) {
     console.error("Error fetching Pokémon by ID:", error);
     return c.json({ error: "Internal server error" }, 500);

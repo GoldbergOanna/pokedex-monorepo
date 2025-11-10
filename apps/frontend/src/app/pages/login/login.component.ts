@@ -105,7 +105,9 @@ export class LoginComponent {
             this.toggleMode();
           }, 2000);
         } else if (isLogin) {
-          this.error.set('Login failed. Please check your credentials.');
+          this.error.set(
+            'Login faild. Please check your credentials or create a new user.',
+          );
         } else {
           this.error.set('Registration failed. Please try again.');
         }
