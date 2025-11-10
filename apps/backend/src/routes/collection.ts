@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middleware/auth.middleware.ts";
-import type { AppVariables } from "../types/context.types.js";
+import type { AppVariables } from "../models/context.types.ts";
 
 export const collectionRoutes = new Hono<{ Variables: AppVariables }>();
 

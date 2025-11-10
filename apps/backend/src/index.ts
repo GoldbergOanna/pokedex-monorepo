@@ -11,9 +11,11 @@ import { collectionRoutes } from "./routes/collection.ts";
 import { buildEvolutionMap } from "./utils/evolution.map.ts";
 import { OwnershipService } from "./services/ownership.service.ts";
 
+import type { AppVariables } from "./models/context.types.ts";
+
 import pokemonsJson from "./data/Pokedex.json" with { type: "json" };
 
-const app = new Hono();
+const app = new Hono<{ Variables: AppVariables }>();
 
 //Middlewares
 app.use("*", logger());
