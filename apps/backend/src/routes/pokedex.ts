@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { dbPool } from "../db";
+import { dbPool } from "../db.js";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 

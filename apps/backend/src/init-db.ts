@@ -1,7 +1,11 @@
-import { dbPool } from "./db";
+import { dbPool } from "./db.ts";
 import fs from "fs/promises";
 import path from "path";
-import type { Pokemon, SeedResult } from "./types/pokemon.types";
+import { fileURLToPath } from "url";
+import type { Pokemon, SeedResult } from "./types/pokemon.types.ts";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const init = async () => {
   console.log("Initializing database...");
@@ -42,7 +46,22 @@ const init = async () => {
 
   //Load pokemon data from JSON file
   const filePath = path.resolve(__dirname, "data", "Pokedex.json");
-  const json: Pokemon[] = JSON.parse(await fs.readFile(filePath, "utf8"));
+  const rawJson = JSON.parse(await fs.readFile(filePath, "utf8"));
+
+  // Transform the data to match our schema
+  interface RawPokemon {
+    name: string | { english: string };
+    type: string[] | string;
+    image?: string;
+    description?: string;
+  }
+
+  const json: Pokemon[] = (rawJson as RawPokemon[]).map((p) => ({
+    name: typeof p.name === "string" ? p.name : p.name.english,
+    type: Array.isArray(p.type) ? p.type.join(", ") : p.type,
+    image: p.image,
+    description: p.description,
+  }));
 
   const batchSize = 100;
   const batches = Array.from(
@@ -52,7 +71,8 @@ const init = async () => {
 
   console.log(`Seeding ${json.length} Pokémon in ${batches.length} batches...`);
 
-  const safe = (text?: string) => (text ? text.replace(/'/g, "''") : "");
+  const safe = (text?: string) =>
+    text ? String(text).replace(/'/g, "''") : "";
 
   const results: SeedResult[] = [];
 

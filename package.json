@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Full-stack Pokédex monorepo (Angular + Hono + PostgreSQL)",
   "scripts": {
-    "dev:all": "docker-compose up --build",
+    "dev": "docker compose up --build",
+    "dev:down": "docker compose down -v",
+    "dev:rebuild": "docker compose up --build --force-recreate",
     "dev:backend": "pnpm --filter @pokedex/backend dev",
     "dev:frontend": "pnpm --filter @pokedex/frontend dev",
     "build": "pnpm -r build",

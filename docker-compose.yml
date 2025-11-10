@@ -16,7 +16,8 @@ services:
 
   backend:
     build:
-      context: ./apps/backend
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
     container_name: pokedex_backend
     restart: always
     command: pnpm run dev
@@ -27,13 +28,14 @@ services:
     depends_on:
       - db
     volumes:
-      - ./apps/backend:/app
+      - ./apps/backend:/app/apps/backend
       - /app/node_modules
-    working_dir: /app
+    working_dir: /app/apps/backend
 
   frontend:
     build:
-      context: ./apps/frontend
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
     container_name: pokedex_frontend
     restart: always
     command: pnpm run start
@@ -42,9 +44,9 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./apps/frontend:/app
+      - ./apps/frontend:/app/apps/frontend
       - /app/node_modules
-    working_dir: /app
+    working_dir: /app/apps/frontend
 
 volumes:
   pg_data:

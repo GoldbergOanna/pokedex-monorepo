@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import { dbPool } from "../db";
+import { dbPool } from "../db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
-import { nanoid } from "zod";
-import type { User, AuthPayload, AuthResponse } from "../types/user.types";
+import { nanoid } from "nanoid";
+import type { User, AuthPayload, AuthResponse } from "../types/user.types.js";
 
 export const authRoutes = new Hono();
 

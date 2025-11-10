@@ -1,7 +1,21 @@
-FROM node:22-alpine
+#Base Image
+FROM node:22-alpine AS base
 WORKDIR /app
-COPY ../../pnpm-lock.yaml ../../package.json ./
-RUN corepack enable && pnpm install --filter frontend
+
+# Copy shared workspace files
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+
+# Enable pnpm
+RUN corepack enable
+
+#Dependencies Layer
+FROM base AS deps
+COPY apps/frontend/package.json ./apps/frontend/
+RUN pnpm install --frozen-lockfile --filter ./apps/frontend...
+
+#Builder Layer
+FROM deps AS build
 COPY . .
-CMD ["pnpm", "run", "start"]
+WORKDIR /app/apps/frontend
 EXPOSE 4200
+CMD ["pnpm", "run", "start"]

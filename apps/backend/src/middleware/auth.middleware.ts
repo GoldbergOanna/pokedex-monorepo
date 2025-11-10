@@ -1,6 +1,6 @@
-import { Context, Next } from "hono";
+import type { Context, Next } from "hono";
 import jwt from "jsonwebtoken";
-import type { AuthPayload } from "../types/user.types";
+import type { AuthPayload } from "../types/user.types.ts";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
