@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  padding: 2rem;
+}
+
+:host::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(255, 255, 255, 0.05) 1%,
+      transparent 1%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(255, 255, 255, 0.05) 1%,
+      transparent 1%
+    );
+  background-size: 100px 100px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+app-trainer,
+app-cards-list {
+  position: relative;
+  z-index: 1;
+}

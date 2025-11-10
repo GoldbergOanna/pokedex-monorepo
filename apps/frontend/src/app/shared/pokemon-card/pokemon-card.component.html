@@ -1,7 +1,12 @@
 <div class="pokemon-card">
-  <img [src]="pokemon.image" [alt]="pokemon.name" />
+  <img
+    [src]="
+      pokemon.image ||
+      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'
+    "
+    [alt]="pokemon.name"
+  />
   <h3>{{ pokemon.name }}</h3>
-  <p>Type: {{ pokemon.type }}</p>
-  <p>Region: {{ pokemon.region }}</p>
-  <p>Rarity: {{ pokemon.rarity }}</p>
+  <p><strong>Type:</strong> {{ pokemon.type }}</p>
+  <p class="description">{{ pokemon.description }}</p>
 </div>

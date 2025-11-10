@@ -1,11 +1,9 @@
 export interface Pokemon {
   id: number;
   name: string;
-  type: string[];
-  region: string;
+  type: string;
   image: string;
   description: string;
-  rarity: string;
 }
 
 export interface PokemonPageResponse {

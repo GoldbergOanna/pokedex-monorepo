@@ -47,13 +47,9 @@ pokedexRoutes.get("/", async (c) => {
 
     return c.json({
       data: pokemonRes.rows,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        data: pokemonRes.rows,
-      },
+      page,
+      totalPages,
+      totalCount: total,
     });
   } catch (error) {
     console.error("Error fetching Pokémon:", error);
