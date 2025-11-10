@@ -1,6 +1,6 @@
 import type { Context, Next } from "hono";
 import jwt from "jsonwebtoken";
-import type { AuthPayload } from "../types/user.types.ts";
+import type { AuthPayload } from "../models/user.types.ts";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 

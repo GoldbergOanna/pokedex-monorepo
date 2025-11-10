@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import type { User, AuthPayload, AuthResponse } from "../types/user.types.ts";
+import type { User, AuthPayload, AuthResponse } from "../models/user.types.ts";
 
 export const authRoutes = new Hono();
 
