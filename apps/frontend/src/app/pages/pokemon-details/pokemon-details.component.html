@@ -1,1 +1,94 @@
-<p>pokemon-details-component works!</p>
+@if (loading()) {
+  <div class="loading">Loading Pokémon...</div>
+} @else {
+  @if (pokemon()) {
+    <div class="pokemon-detail-card">
+      <div class="card-header">
+        <button class="back" (click)="goBack()">Back</button>
+        <div class="pokemon-id">
+          #{{ (pokemon()?.id || 0).toString().padStart(3, "0") }}
+        </div>
+        <h1 class="pokemon-name">{{ pokemon()?.name }}</h1>
+        <div class="pokemon-types">
+          <span class="type-badge" [attr.data-type]="pokemon()?.type">{{
+            pokemon()?.type
+          }}</span>
+        </div>
+      </div>
+
+      <div class="card-image">
+        <img [src]="pokemon()?.image" [alt]="pokemon()?.name" />
+      </div>
+
+      <div class="card-body">
+        <section class="info-section">
+          <h3>Species</h3>
+          <p>{{ pokemon()?.species }}</p>
+        </section>
+
+        <section class="info-section description">
+          <h3>Description</h3>
+          <p>{{ pokemon()?.description }}</p>
+        </section>
+
+        <section class="info-section stats">
+          <h3>Base Stats</h3>
+          <div class="stats-grid">
+            @for (stat of pokemon()?.base | keyvalue; track stat.key) {
+              <div class="stat-item">
+                <span class="stat-name">{{ stat.key }}</span>
+                <div class="stat-bar-container">
+                  <div
+                    class="stat-bar"
+                    [style.width.%]="(stat.value / 255) * 100"
+                  ></div>
+                  <span class="stat-value">{{ stat.value }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="info-section profile-grid">
+          <div class="profile-item">
+            <h4>Height</h4>
+            <p>{{ pokemon()?.profile?.height }}</p>
+          </div>
+          <div class="profile-item">
+            <h4>Weight</h4>
+            <p>{{ pokemon()?.profile?.weight }}</p>
+          </div>
+          <div class="profile-item">
+            <h4>Gender</h4>
+            <p>{{ pokemon()?.profile?.gender }}</p>
+          </div>
+          <div class="profile-item full-width">
+            <h4>Egg Groups</h4>
+            <p>{{ pokemon()?.profile?.egg?.join(", ") || "N/A" }}</p>
+          </div>
+          <div class="profile-item full-width">
+            <h4>Abilities</h4>
+            <div class="abilities">
+              @for (a of pokemon()?.profile?.ability; track a[0]) {
+                <span class="ability-badge">
+                  {{ a[0] }}{{ a[1] === "true" ? " ⭐" : "" }}
+                </span>
+              }
+            </div>
+          </div>
+        </section>
+
+        <div class="card-actions">
+          <button
+            class="btn-catch"
+            (click)="toggleOwnership()"
+            [disabled]="service.loading()"
+            [class.owned]="owned()"
+          >
+            {{ owned() ? "Release" : "Catch" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

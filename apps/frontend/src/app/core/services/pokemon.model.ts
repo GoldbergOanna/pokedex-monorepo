@@ -1,7 +1,7 @@
 export interface Pokemon {
   id: number;
   name: { english: string; japanese: string; chinese: string; french: string };
-  type: string[];
+  type: string;
   base: Record<string, number>;
   species: string;
   description: string;

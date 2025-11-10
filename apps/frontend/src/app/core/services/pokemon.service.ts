@@ -69,6 +69,16 @@ export class PokemonService {
       );
   }
 
+  getById(id: number) {
+    this.loading.set(true);
+    return this.api.get<Pokemon>(`pokedex/${id}`).pipe(
+      tap({
+        next: () => this.loading.set(false),
+        error: () => this.loading.set(false),
+      }),
+    );
+  }
+
   toggleOwnership(id: number) {
     return this.api
       .post<{
