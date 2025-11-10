@@ -20,6 +20,10 @@ const PokemonQuerySchema = z.object({
     .regex(/^\d+$/, "Limit must be a number")
     .transform((val) => parseInt(val, 10))
     .default(20),
+  search: z.string().optional(),
+  type: z.string().optional(),
+  tier: z.string().optional(),
+  description: z.string().optional(),
 });
 
 // GET /pokedex - Pokémons list with pagination
@@ -32,9 +36,70 @@ pokedexRoutes.get("/", async (c) => {
         400,
       );
     }
-    const { page, limit } = parsed.data;
+    const { page, limit, search, type, tier, description } = parsed.data;
     const offset = (page - 1) * limit;
     const userId = c.get("userId");
+
+    const conditions: string[] = [];
+    const queryParams: (string | number)[] = [limit, offset, userId];
+    const countParams: (string | number)[] = [];
+    let paramIndex = 4;
+
+    if (search) {
+      conditions.push(`p.name ->> 'english' ILIKE $${paramIndex}`);
+      queryParams.push(`%${search}%`);
+      countParams.push(`%${search}%`);
+      paramIndex++;
+    }
+
+    if (type) {
+      conditions.push(`$${paramIndex} = ANY(p.type)`);
+      queryParams.push(type);
+      countParams.push(type);
+      paramIndex++;
+    }
+
+    if (tier) {
+      conditions.push(`p.base ->> 'Evolution' = $${paramIndex}`);
+      queryParams.push(tier);
+      countParams.push(tier);
+      paramIndex++;
+    }
+
+    if (description) {
+      conditions.push(`p.description ILIKE $${paramIndex}`);
+      queryParams.push(`%${description}%`);
+      countParams.push(`%${description}%`);
+      paramIndex++;
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const countConditions: string[] = [];
+    let countParamIndex = 1;
+
+    if (search) {
+      countConditions.push(`p.name ->> 'english' ILIKE $${countParamIndex}`);
+      countParamIndex++;
+    }
+    if (type) {
+      countConditions.push(`$${countParamIndex} = ANY(p.type)`);
+      countParamIndex++;
+    }
+    if (tier) {
+      countConditions.push(`p.base ->> 'Evolution' = $${countParamIndex}`);
+      countParamIndex++;
+    }
+    if (description) {
+      countConditions.push(`p.description ILIKE $${countParamIndex}`);
+      countParamIndex++;
+    }
+
+    const countWhereClause =
+      countConditions.length > 0
+        ? `WHERE ${countConditions.join(" AND ")}`
+        : "";
 
     const [pokemonRes, countRes] = await Promise.all([
       dbPool.query(
@@ -44,16 +109,22 @@ pokedexRoutes.get("/", async (c) => {
           p.name ->> 'english' AS name,
           p.type,
           p.image ->> 'hires' AS image,
+          p.base ->> 'Evolution' AS stage,
+          p.description,
           (op.user_id IS NOT NULL) AS owned
         FROM pokemon p
         LEFT JOIN owned_pokemon op
           ON op.pokemon_id = p.id AND op.user_id = $3
+        ${whereClause}
         ORDER BY p.id
         LIMIT $1 OFFSET $2
         `,
-        [limit, offset, userId],
+        queryParams,
       ),
-      dbPool.query("SELECT COUNT(*) FROM pokemon"),
+      dbPool.query(
+        `SELECT COUNT(*) FROM pokemon p ${countWhereClause}`,
+        countParams,
+      ),
     ]);
 
     const total = Number(countRes.rows[0].count);
@@ -65,6 +136,8 @@ pokedexRoutes.get("/", async (c) => {
       name: p.name,
       type: Array.isArray(p.type) ? p.type : [p.type],
       image: p.image,
+      stage: p.stage,
+      description: p.description,
       owned: p.owned,
     }));
 

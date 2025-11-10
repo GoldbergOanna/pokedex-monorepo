@@ -31,12 +31,14 @@ export class CardsListComponent {
   private filtersSignal = formToSignal(this.filterForm);
 
   private syncFiltersEffect = effect(() => {
-    const filters = this.filterForm.getRawValue();
-    this.pokemonService.updateQuery({
-      ...filters,
-      page: 1,
-      limit: 20,
-    });
+    const filters = this.filtersSignal();
+    if (filters) {
+      this.pokemonService.updateQuery({
+        ...filters,
+        page: 1,
+        limit: 20,
+      });
+    }
   });
 
   previousPage() {

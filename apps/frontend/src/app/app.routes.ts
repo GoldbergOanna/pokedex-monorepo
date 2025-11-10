@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { inject } from '@angular/core';
 import { AuthGuard } from '@core/auth/guard/auth.guard';
 
 export const routes: Routes = [
@@ -19,6 +18,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@pages/pokedex/pokedex.component').then(
         (m) => m.PokedexComponent,
+      ),
+  },
+  {
+    path: 'pokedex/:id',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('@pages/pokemon-details/pokemon-details.component').then(
+        (m) => m.PokemonDetailsComponent,
       ),
   },
   {
