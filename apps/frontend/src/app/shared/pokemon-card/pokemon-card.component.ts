@@ -1,6 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PokemonSummary } from '@core/services/pokemon.model';
+import type { PokemonSummary } from '@pokedex/shared-types';
 import { Router } from '@angular/router';
 import { PokemonService } from '@core/services/pokemon.service';
 @Component({

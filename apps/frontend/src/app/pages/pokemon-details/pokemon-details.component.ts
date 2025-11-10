@@ -2,7 +2,7 @@ import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PokemonService } from '@core/services/pokemon.service';
-import type { Pokemon } from '@core/services/pokemon.model';
+import type { Pokemon } from '@pokedex/shared-types';
 
 @Component({
   selector: 'app-pokemon-details',
