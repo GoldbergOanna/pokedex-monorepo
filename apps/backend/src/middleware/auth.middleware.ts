@@ -1,11 +1,15 @@
 import type { Context, Next } from "hono";
 import jwt from "jsonwebtoken";
 import type { AuthPayload } from "../models/user.types.ts";
+import type { AppVariables } from "../types/context.types.js";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 // Authentication Middleware
-export const authMiddleware = async (c: Context, next: Next) => {
+export const authMiddleware = async (
+  c: Context<{ Variables: AppVariables }>,
+  next: Next,
+) => {
   try {
     const authHeader = c.req.header("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -16,7 +20,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
     const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
 
     // Attach decoded user info so downstream routes can access user info
-    c.set("user", decoded);
+    c.set("userId", decoded.userId);
 
     await next();
   } catch (error) {

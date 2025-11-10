@@ -7,6 +7,8 @@ import type { EvolutionMap } from "../models/pokemon.types";
 import { PokemonRepository } from "../repositories/pokemon.repo";
 import { OwnershipRepository } from "../repositories/ownership.repo";
 
+//service handling pokemon data retrieval and composition
+
 export class PokemonService {
   constructor(
     private repo: PokemonRepository,
@@ -64,22 +66,33 @@ export class PokemonService {
     };
   }
 
+  /**
+   * Recursively collects all Pokemon in the evolution chain
+   * Returns ordered list with current Pokemon first, then related evolutions
+   */
   private getEvolutionChain(id: number): Pokemon[] {
-    const chainIds = new Set<number>();
-    const collect = (pid: number) => {
-      const { prev = [], next = [] } = this.evoMap[pid] ?? {};
-      for (const rel of [...prev, ...next]) {
-        if (!chainIds.has(rel)) {
-          chainIds.add(rel);
-          collect(rel);
+    const chainIds = new Set<number>([id]);
+
+    const collectRelatedIds = (pokemonId: number): void => {
+      const relations = this.evoMap[pokemonId];
+      if (!relations) return;
+
+      const relatedIds = [...(relations.prev ?? []), ...(relations.next ?? [])];
+      for (const relatedId of relatedIds) {
+        if (!chainIds.has(relatedId)) {
+          chainIds.add(relatedId);
+          collectRelatedIds(relatedId);
         }
       }
     };
-    collect(id);
-    const allIds = [id, ...chainIds];
-    return this.repo
-      .findAll()
-      .flat()[0]
-      .filter((p) => allIds.includes(p.id));
+
+    collectRelatedIds(id);
+
+    const chain = Array.from(chainIds)
+      .map((chainId) => this.repo.findById(chainId))
+      .filter((pokemon): pokemon is Pokemon => pokemon !== undefined)
+      .sort((a, b) => a.id - b.id);
+
+    return chain;
   }
 }
