@@ -1,5 +1,10 @@
-import { HttpHandlerFn, HttpInterceptorFn } from '@angular/common/http';
+import {
+  HttpHandlerFn,
+  HttpInterceptorFn,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '@core/auth/service/auth.service';
 import { catchError, throwError } from 'rxjs';
 
@@ -8,6 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn,
 ) => {
   const authservice = inject(AuthService);
+  const router = inject(Router);
   const accessToken = authservice.getAccessToken();
 
   const cloned = accessToken
@@ -16,8 +22,10 @@ export const authInterceptor: HttpInterceptorFn = (
 
   return next(cloned).pipe(
     catchError((error: unknown) => {
-      if (error instanceof Response && error.status === 401) {
+      // Handle expired or invalid token
+      if (error instanceof HttpErrorResponse && error.status === 401) {
         authservice.logout();
+        router.navigate(['/login']);
       }
       return throwError(() => error);
     }),

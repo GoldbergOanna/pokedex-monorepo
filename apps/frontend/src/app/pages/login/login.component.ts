@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@core/auth/service/auth.service';
 import { LoginResponse } from '@core/core.types';
 import { Observable } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type AuthMode = 'login' | 'register';
 @Component({
@@ -83,21 +84,33 @@ export class LoginComponent {
       : this.authService.register(name!, email, password);
 
     const successRedirect = isLogin ? '/pokedex' : '/login';
-    const errorMessage = isLogin
-      ? 'Login failed. Please check your credentials.'
-      : 'Registration failed. Please try again.';
 
-    this.handleAuth(action$, successRedirect, errorMessage);
+    this.handleAuth(action$, successRedirect, isLogin);
   }
 
   private handleAuth(
     action$: Observable<LoginResponse | null>,
     successPath: string,
-    errorText: string,
+    isLogin: boolean,
   ) {
     action$.subscribe({
       next: () => this.router.navigate([successPath]),
-      error: () => this.error.set(errorText),
+      error: (error: HttpErrorResponse) => {
+        if (!isLogin && (error.status === 409 || error.status === 400)) {
+          // User already exists - show message and switch to login
+          this.error.set(
+            'This email is already registered. Please login instead.',
+          );
+          setTimeout(() => {
+            this.toggleMode();
+          }, 2000);
+        } else if (isLogin) {
+          this.error.set('Login failed. Please check your credentials.');
+        } else {
+          this.error.set('Registration failed. Please try again.');
+        }
+        this.loading.set(false);
+      },
       complete: () => this.loading.set(false),
     });
   }

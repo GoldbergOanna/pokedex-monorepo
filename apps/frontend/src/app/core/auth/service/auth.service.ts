@@ -1,7 +1,8 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { tap, catchError, of } from 'rxjs';
+import { tap, catchError, throwError } from 'rxjs';
 import { ApiService } from '@core/api/api.service';
 import type { LoginResponse } from '@core/core.types';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +25,7 @@ export class AuthService {
       }),
       catchError((error) => {
         console.error('Login failed', error);
-        return of(null);
+        return throwError(() => error);
       }),
     );
   }
@@ -39,9 +40,9 @@ export class AuthService {
             localStorage.setItem('accessToken', accessToken);
           }
         }),
-        catchError((error) => {
+        catchError((error: HttpErrorResponse) => {
           console.error('Registration failed', error);
-          return of(null);
+          return throwError(() => error);
         }),
       );
   }
