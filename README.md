@@ -32,10 +32,14 @@ A full-stack TypeScript monorepo application for browsing and collecting Pokémo
 - High-quality images and stats display
 
 ✅ **Ownership Management**
-- Mark Pokémon as owned/released
+- Toggle Pokémon as owned/released with a single click
 - **Evolution rule**: Catching an evolved Pokémon automatically marks all pre-evolution forms as owned
-- Real-time UI updates across cached pages
-- Personal collection view
+  - Example: Catching Charizard automatically marks Charmander and Charmeleon as owned
+  - Recursive evolution chain traversal handles complex multi-stage evolutions
+  - Backend enforces this rule to ensure data consistency
+- Real-time UI updates across cached pages (list and detail views stay in sync)
+- Personal collection view to track all owned Pokémon
+- Visual indicators (badges) on cards show ownership status at a glance
 
 ✅ **Architecture**
 - **Modular layered architecture** with clear separation of concerns
