@@ -2,7 +2,7 @@ import { dbPool } from "./db.ts";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import type { Pokemon, SeedResult } from "./models/pokemon.types.ts";
+import type { Pokemon, SeedResult } from "@pokedex/shared-types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,8 +16,6 @@ const init = async () => {
   await dbPool.query(`DROP TABLE IF EXISTS pokemon CASCADE;`);
   await dbPool.query(`DROP TABLE IF EXISTS users CASCADE;`);
   console.log("✅ Tables dropped");
-
-  //Create tables
   await dbPool.query(`
     CREATE TABLE users (
       id TEXT PRIMARY KEY,
@@ -51,8 +49,6 @@ const init = async () => {
   `);
 
   console.log("✅ Tables created");
-
-  //Load Pokémon data from JSON
   const filePath = path.resolve(__dirname, "data", "Pokedex.json");
   const raw = await fs.readFile(filePath, "utf8");
   const pokemons = JSON.parse(raw) as Pokemon[];
@@ -67,7 +63,6 @@ const init = async () => {
     `📦 Seeding ${pokemons.length} Pokémon in ${batches.length} batches...`,
   );
 
-  // helper to escape quotes safely
   const safe = (text?: string) =>
     text ? String(text).replace(/'/g, "''") : "";
 

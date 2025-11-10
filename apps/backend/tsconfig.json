@@ -10,7 +10,10 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@pokedex/shared-types": ["../../libs/shared-types/src/index.ts"]
+    }
   },
   "include": ["src/**/*.ts"],
   "ts-node": {

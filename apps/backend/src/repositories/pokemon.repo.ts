@@ -1,6 +1,4 @@
-import type { Pokemon, PokemonFilters } from "../models/pokemon.types";
-
-//handles filteribg and pagination for pokemons
+import type { Pokemon, PokemonFilters } from "@pokedex/shared-types";
 export class PokemonRepository {
   private pokemons: Pokemon[];
 

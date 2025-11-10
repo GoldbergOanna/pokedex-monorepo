@@ -17,9 +17,6 @@ collectionRoutes.get("/", async (c) => {
   return c.json({ owned });
 });
 
-/**
- * POST /me/collection/:pokemonId/toggle
- */
 collectionRoutes.post("/:pokemonId/toggle", async (c) => {
   try {
     const userId = c.get("userId");

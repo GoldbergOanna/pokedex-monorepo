@@ -1,11 +1,11 @@
-import { Injectable, signal, computed, inject, effect } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { ApiService } from '@core/api/api.service';
-import {
+import type {
   QueryParams,
-  type Pokemon,
-  type PokemonSummary,
-  type PokemonPageResponse,
-} from './pokemon.model';
+  Pokemon,
+  PokemonSummary,
+  PokemonPageResponse,
+} from '@pokedex/shared-types';
 import { BehaviorSubject, Observable, of, switchMap, tap } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 
@@ -13,17 +13,13 @@ import { HttpParams } from '@angular/common/http';
 export class PokemonService {
   private api = inject(ApiService);
 
-  // State
   loading = signal(false);
   pokemons = signal<PokemonSummary[]>([]);
   totalPages = signal(1);
   totalCount = signal(0);
   currentpage = signal(1);
 
-  //in-memory cache
   private cache = new Map<string, PokemonPageResponse>();
-
-  // subbject for manual triggers is needed
   private _quesry$ = new BehaviorSubject<QueryParams>({ page: 1, limit: 20 });
 
   readonly state$ = this._quesry$.pipe(
@@ -31,7 +27,6 @@ export class PokemonService {
   );
 
   constructor() {
-    //keep the signals in sync with stream
     this.state$.subscribe((pageData) => {
       this.pokemons.set(pageData.data);
       this.totalPages.set(pageData.totalPages);
@@ -40,14 +35,12 @@ export class PokemonService {
     });
   }
 
-  //method to update query params
   updateQuery(params: QueryParams) {
     const currentParams = this._quesry$.value;
     const newParams = { ...currentParams, ...params };
     this._quesry$.next(newParams);
   }
 
-  //fetch page with caching
   fetchPage(params: QueryParams): Observable<PokemonPageResponse> {
     const query = JSON.stringify(params);
     const cached = this.cache.get(query);
@@ -107,16 +100,6 @@ export class PokemonService {
           },
         }),
       );
-  }
-
-  private buildQuery(params: QueryParams): string {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, value.toString());
-      }
-    });
-    return searchParams.toString();
   }
 
   clearCache() {

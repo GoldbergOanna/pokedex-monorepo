@@ -26,7 +26,8 @@
       "@environments/*": ["src/environments/*"],
       "@core/*": ["src/app/core/*"],
       "@shared/*": ["src/app/shared/*"],
-      "@pages/*": ["src/app/pages/*"]
+      "@pages/*": ["src/app/pages/*"],
+      "@pokedex/shared-types": ["../../libs/shared-types/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

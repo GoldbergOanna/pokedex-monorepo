@@ -1,4 +1,4 @@
-import type { EvolutionMap } from "../models/pokemon.types";
+import type { EvolutionMap } from "@pokedex/shared-types";
 import { findPreEvolutions } from "../utils/evolution.utils.ts";
 import { OwnershipRepository } from "../repositories/ownership.repo.ts";
 
@@ -23,11 +23,9 @@ export class OwnershipService {
       const preEvos = findPreEvolutions(pokemonId, this.evoMap);
       const toInsert = [pokemonId, ...preEvos];
 
-      // Validate that all Pokemon IDs exist in the evolution map
       const invalidIds = toInsert.filter((id) => !this.evoMap[id]);
       if (invalidIds.length > 0) {
         console.warn(`Invalid Pokemon IDs found: ${invalidIds.join(", ")}`);
-        // Filter out invalid IDs before inserting
         const validIds = toInsert.filter((id) => this.evoMap[id]);
         if (validIds.length === 0) {
           throw new Error(

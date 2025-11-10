@@ -1,9 +1,5 @@
-import type { EvolutionMap } from "../models/pokemon.types";
+import type { EvolutionMap } from "@pokedex/shared-types";
 
-/**
- * Recursively collects all pre-evolution Pokémon IDs
- * for the given Pokémon using the in-memory EvolutionMap.
- */
 export const findPreEvolutions = (
   id: number,
   evoMap: EvolutionMap,

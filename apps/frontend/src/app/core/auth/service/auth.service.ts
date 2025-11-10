@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { tap, catchError, throwError } from 'rxjs';
 import { ApiService } from '@core/api/api.service';
-import type { LoginResponse } from '@core/core.types';
+import type { AuthResponse } from '@pokedex/shared-types';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
@@ -10,7 +10,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class AuthService {
   private readonly api = inject(ApiService);
 
-  //auth signals
   private readonly _isAuthenticated = signal<string | null>(
     localStorage.getItem('accessToken'),
   );
@@ -21,7 +20,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this._isAuthenticated());
 
   login(email: string, password: string) {
-    return this.api.post<LoginResponse>('auth/login', { email, password }).pipe(
+    return this.api.post<AuthResponse>('auth/login', { email, password }).pipe(
       tap(({ accessToken, name }) => {
         this._isAuthenticated.set(accessToken);
         localStorage.setItem('accessToken', accessToken);
@@ -39,7 +38,7 @@ export class AuthService {
 
   register(name: string, email: string, password: string) {
     return this.api
-      .post<LoginResponse>('auth/register', { name, email, password })
+      .post<AuthResponse>('auth/register', { name, email, password })
       .pipe(
         tap(({ accessToken, name: userName }) => {
           if (accessToken) {

@@ -6,7 +6,6 @@ import type { AppVariables } from "../models/context.types.ts";
 
 export const pokedexRoutes = new Hono<{ Variables: AppVariables }>();
 
-//require authentication for all pokedex routes
 pokedexRoutes.use("*", authMiddleware);
 
 const PokemonQuerySchema = z.object({
@@ -26,7 +25,6 @@ const PokemonQuerySchema = z.object({
   description: z.string().optional(),
 });
 
-// GET /pokedex - Pokémons list with pagination
 pokedexRoutes.get("/", async (c) => {
   try {
     const parsed = PokemonQuerySchema.safeParse(c.req.query());
@@ -130,7 +128,6 @@ pokedexRoutes.get("/", async (c) => {
     const total = Number(countRes.rows[0].count);
     const totalPages = Math.ceil(total / limit);
 
-    // Transform data to array type
     const transformedData = pokemonRes.rows.map((p) => ({
       id: p.id,
       name: p.name,
@@ -153,7 +150,6 @@ pokedexRoutes.get("/", async (c) => {
   }
 });
 
-// GET /pokedex/:id - Get Pokémon by ID
 pokedexRoutes.get("/:id", async (c) => {
   try {
     const { id } = c.req.param();

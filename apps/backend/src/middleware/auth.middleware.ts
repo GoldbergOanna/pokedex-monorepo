@@ -1,11 +1,10 @@
 import type { Context, Next } from "hono";
 import jwt from "jsonwebtoken";
-import type { AuthPayload } from "../models/user.types.ts";
+import type { AuthPayload } from "@pokedex/shared-types";
 import type { AppVariables } from "../models/context.types.ts";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-// Authentication Middleware
 export const authMiddleware = async (
   c: Context<{ Variables: AppVariables }>,
   next: Next,

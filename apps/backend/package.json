@@ -15,6 +15,7 @@
   "packageManager": "pnpm@10.20.0",
   "dependencies": {
     "@hono/node-server": "^1.19.6",
+    "@pokedex/shared-types": "workspace:*",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "hono": "^4.10.4",

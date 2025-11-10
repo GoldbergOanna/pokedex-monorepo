@@ -2,8 +2,8 @@ import type {
   Pokemon,
   PokemonSummary,
   PokemonDetail,
-} from "../models/pokemon.types";
-import type { EvolutionMap } from "../models/pokemon.types";
+  EvolutionMap,
+} from "@pokedex/shared-types";
 import { PokemonRepository } from "../repositories/pokemon.repo";
 import { OwnershipRepository } from "../repositories/ownership.repo";
 

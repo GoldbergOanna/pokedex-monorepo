@@ -1,6 +1,4 @@
-import type { Pokemon, EvolutionMap } from "../models/pokemon.types";
-
-//quick lookup of previous / next evolutions.
+import type { Pokemon, EvolutionMap } from "@pokedex/shared-types";
 export const buildEvolutionMap = (pokemons: Pokemon[]): EvolutionMap => {
   const map: EvolutionMap = {};
   for (const p of pokemons) {

@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import type { User, AuthPayload, AuthResponse } from "../models/user.types.ts";
+import type { User, AuthPayload, AuthResponse } from "@pokedex/shared-types";
 
 export const authRoutes = new Hono();
 
@@ -21,7 +21,6 @@ const loginSchema = z.object({
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-// Registration Route
 authRoutes.post("/register", async (c) => {
   const payload = await c.req.json().catch(() => null);
   if (!payload) return c.json({ message: "Invalid JSON payload" }, 400);
@@ -62,7 +61,6 @@ authRoutes.post("/register", async (c) => {
   }
 });
 
-//Loin route
 authRoutes.post("/login", async (c) => {
   const payload = await c.req.json().catch(() => null);
   if (!payload) return c.json({ message: "Invalid JSON payload" }, 400);
