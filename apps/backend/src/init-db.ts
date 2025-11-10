@@ -1,7 +1,7 @@
 import { dbPool } from "./db";
 import fs from "fs/promises";
 import path from "path";
-import type { Pokemon, SeedResult } from "./types/pokemon";
+import type { Pokemon, SeedResult } from "./types/pokemon.types";
 
 const init = async () => {
   console.log("Initializing database...");
