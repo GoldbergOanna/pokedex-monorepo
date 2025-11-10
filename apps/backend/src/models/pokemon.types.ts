@@ -38,3 +38,14 @@ export interface PokemonDetail extends PokemonSummary {
   profile: Pokemon["profile"];
   image: Pokemon["image"];
 }
+
+export interface PokemonFilters {
+  search?: string;
+  type?: string;
+  tier?: number;
+  description?: string;
+  sortBy?: "id" | "name" | "tier";
+  order?: "asc" | "desc";
+}
+
+export type EvolutionMap = Record<number, { next: number[]; prev: number[] }>;

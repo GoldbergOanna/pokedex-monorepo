@@ -8,11 +8,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const init = async () => {
-  console.log("Initializing database...");
+  console.log("🔧 Initializing database...");
 
-  //Create tables if not exists
+  // Drop existing tables
+  console.log("🗑️  Dropping existing tables...");
+  await dbPool.query(`DROP TABLE IF EXISTS owned_pokemon CASCADE;`);
+  await dbPool.query(`DROP TABLE IF EXISTS pokemon CASCADE;`);
+  await dbPool.query(`DROP TABLE IF EXISTS users CASCADE;`);
+  console.log("✅ Tables dropped");
+
+  //Create tables
   await dbPool.query(`
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE users (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
@@ -21,82 +28,88 @@ const init = async () => {
   `);
 
   await dbPool.query(`
-    CREATE TABLE IF NOT EXISTS pokemon (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      type TEXT,
-      image TEXT,
-      description TEXT
+    CREATE TABLE pokemon (
+      id INT PRIMARY KEY,
+      name JSONB NOT NULL,
+      type TEXT[] NOT NULL,
+      base JSONB,
+      species TEXT,
+      description TEXT,
+      evolution JSONB,
+      profile JSONB,
+      image JSONB
     );
   `);
 
-  console.log("Tables verified");
-
-  //Check existing seed
-  const { rows } = await dbPool.query(
-    "SELECT COUNT(*)::int AS count FROM pokemon",
-  );
-  if (rows[0].count > 0) {
-    console.log(
-      `Pokemon table already seeded (${rows[0].count} entries). Skipping...`,
+  await dbPool.query(`
+    CREATE TABLE owned_pokemon (
+      user_id TEXT NOT NULL,
+      pokemon_id INT NOT NULL,
+      PRIMARY KEY (user_id, pokemon_id),
+      FOREIGN KEY (pokemon_id) REFERENCES pokemon(id)
     );
-    await dbPool.end();
-    return;
-  }
+  `);
 
-  //Load pokemon data from JSON file
+  console.log("✅ Tables created");
+
+  //Load Pokémon data from JSON
   const filePath = path.resolve(__dirname, "data", "Pokedex.json");
-  const rawJson = JSON.parse(await fs.readFile(filePath, "utf8"));
+  const raw = await fs.readFile(filePath, "utf8");
+  const pokemons = JSON.parse(raw) as Pokemon[];
 
-  // Transform the data to match our schema
-  interface RawPokemon {
-    name: string | { english: string };
-    type: string[] | string;
-    image?: string;
-    description?: string;
-  }
-
-  const json: Pokemon[] = (rawJson as RawPokemon[]).map((p) => ({
-    name: typeof p.name === "string" ? p.name : p.name.english,
-    type: Array.isArray(p.type) ? p.type.join(", ") : p.type,
-    image: p.image,
-    description: p.description,
-  }));
-
-  const batchSize = 100;
+  const batchSize = 200;
   const batches = Array.from(
-    { length: Math.ceil(json.length / batchSize) },
-    (_, i) => json.slice(i * batchSize, (i + 1) * batchSize),
+    { length: Math.ceil(pokemons.length / batchSize) },
+    (_, i) => pokemons.slice(i * batchSize, (i + 1) * batchSize),
   );
 
-  console.log(`Seeding ${json.length} Pokémon in ${batches.length} batches...`);
+  console.log(
+    `📦 Seeding ${pokemons.length} Pokémon in ${batches.length} batches...`,
+  );
 
+  // helper to escape quotes safely
   const safe = (text?: string) =>
     text ? String(text).replace(/'/g, "''") : "";
 
   const results: SeedResult[] = [];
 
+  // Insert batches
+  await dbPool.query("BEGIN");
   for await (const [index, batch] of batches.entries()) {
-    const queryValues = batch
-      .map(
-        ({ name, type, image, description }) =>
-          `('${safe(name)}', '${safe(type)}', '${safe(image)}', '${safe(description)}')`,
-      )
+    const values = batch
+      .map((p) => {
+        const id = p.id;
+        const name = JSON.stringify(p.name).replace(/'/g, "''");
+        const typeArray = p.type.map((t) => `'${safe(t)}'`).join(",");
+        const base = JSON.stringify(p.base ?? {}).replace(/'/g, "''");
+        const species = safe(p.species);
+        const description = safe(p.description);
+        const evolution = JSON.stringify(p.evolution ?? {}).replace(/'/g, "''");
+        const profile = JSON.stringify(p.profile ?? {}).replace(/'/g, "''");
+        const image = JSON.stringify(p.image ?? {}).replace(/'/g, "''");
+
+        return `(${id}, '${name}', ARRAY[${typeArray}], '${base}', '${species}', '${description}', '${evolution}', '${profile}', '${image}')`;
+      })
       .join(",");
 
-    const query = `INSERT INTO pokemon (name, type, image, description) VALUES ${queryValues}`;
+    const query = `
+      INSERT INTO pokemon
+      (id, name, type, base, species, description, evolution, profile, image)
+      VALUES ${values};
+    `;
 
     await dbPool.query(query);
 
     const result: SeedResult = {
       inserted: (index + 1) * batch.length,
-      total: json.length,
+      total: pokemons.length,
       completed: index === batches.length - 1,
     };
 
     results.push(result);
     console.log(`Inserted ${result.inserted}/${result.total}`);
   }
+  await dbPool.query("COMMIT");
 
   console.log("Seeding complete!");
   await dbPool.end();
