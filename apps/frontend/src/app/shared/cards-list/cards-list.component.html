@@ -1,0 +1,50 @@
+<section class="filters" [formGroup]="filterForm">
+  <input formControlName="search" placeholder="Search Pokémon…" />
+
+  <select formControlName="type">
+    <option value="">All Types</option>
+    @for (
+      type of [
+        "Fire",
+        "Water",
+        "Grass",
+        "Electric",
+        "Psychic",
+        "Normal",
+        "Rock",
+        "Ice",
+      ];
+      track type
+    ) {
+      <option [value]="type">{{ type }}</option>
+    }
+  </select>
+
+  <select formControlName="tier">
+    <option value="">All Tiers</option>
+    @for (tier of ["Base", "Stage 1", "Stage 2", "Mega"]; track tier) {
+      <option [value]="tier">{{ tier }}</option>
+    }
+  </select>
+  <input formControlName="description" placeholder="Filter by description…" />
+</section>
+
+<section class="pokedex-grid">
+  @if (loading()) {
+    <p>Loading Pokémon…</p>
+  } @else {
+    @for (p of pokemons(); track p.id) {
+      <app-pokemon-card [pokemon]="p" />
+    } @empty {
+      <p>No Pokémon match your filters.</p>
+    }
+  }
+</section>
+
+<footer class="pagination">
+  <button (click)="previousPage()" [disabled]="page() === 1">Prev</button>
+  <span>Page {{ page() }} / {{ totalPages() }}</span>
+  <button (click)="nextPage()" [disabled]="page() === totalPages()">
+    Next
+  </button>
+</footer>
