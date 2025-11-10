@@ -60,7 +60,7 @@
         placeholder="Enter your password"
       />
     </label>
-    @if (controls.password.invalid && controls.password.touched) {
+    @if (controls.password.invalid && controls.password.dirty) {
       <div class="error">Min 6 characters required.</div>
     }
 

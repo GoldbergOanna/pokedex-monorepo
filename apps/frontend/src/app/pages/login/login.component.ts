@@ -36,8 +36,13 @@ export class LoginComponent {
   constructor() {
     effect(() => {
       const path = this.route.snapshot.routeConfig?.path;
-      if (path === 'register') this.mode.set('register');
-      else this.mode.set('login');
+      if (path === 'register') {
+        this.mode.set('register');
+      } else {
+        this.mode.set('login');
+        this.controls.name.clearValidators();
+        this.controls.name.updateValueAndValidity();
+      }
     });
   }
 
@@ -46,6 +51,16 @@ export class LoginComponent {
     this.mode.set(nextMode);
     this.error.set(null);
     this.loginForm.reset();
+
+    if (nextMode === 'login') {
+      this.controls.name.clearValidators();
+    } else {
+      this.controls.name.setValidators([
+        Validators.required,
+        Validators.minLength(2),
+      ]);
+    }
+    this.controls.name.updateValueAndValidity();
 
     //navigate without full reload
     this.router.navigate([`/${nextMode}`]);
