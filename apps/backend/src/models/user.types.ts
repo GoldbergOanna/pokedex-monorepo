@@ -12,4 +12,5 @@ export interface AuthPayload {
 export interface AuthResponse {
   accessToken: string;
   expiresIn?: string;
+  name?: string;
 }

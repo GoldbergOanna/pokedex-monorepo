@@ -51,7 +51,11 @@ authRoutes.post("/register", async (c) => {
       [userId, name, email, hashedPassword],
     );
 
-    return c.json({ message: "User registered successfully" }, 201);
+    const payload: AuthPayload = { userId };
+    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+
+    const response: AuthResponse = { accessToken, expiresIn: "1h", name };
+    return c.json(response, 201);
   } catch (error) {
     console.error("Registration error:", error);
     return c.json({ error: "Internal server error" }, 500);
@@ -75,7 +79,7 @@ authRoutes.post("/login", async (c) => {
 
   try {
     const result = await dbPool.query<User>(
-      "SELECT id, password FROM users WHERE email = $1",
+      "SELECT id, name, password FROM users WHERE email = $1",
       [email],
     );
     const user = result.rows[0];
@@ -87,7 +91,11 @@ authRoutes.post("/login", async (c) => {
     const payload: AuthPayload = { userId: user.id };
     const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
-    const response: AuthResponse = { accessToken, expiresIn: "1h" };
+    const response: AuthResponse = {
+      accessToken,
+      expiresIn: "1h",
+      name: user.name,
+    };
     return c.json(response, 200);
   } catch (error) {
     console.error("Login error:", error);

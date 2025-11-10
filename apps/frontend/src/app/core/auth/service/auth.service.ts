@@ -14,14 +14,21 @@ export class AuthService {
   private readonly _isAuthenticated = signal<string | null>(
     localStorage.getItem('accessToken'),
   );
+  private readonly _userName = signal<string | null>(
+    localStorage.getItem('userName'),
+  );
 
   readonly isAuthenticated = computed(() => !!this._isAuthenticated());
 
   login(email: string, password: string) {
     return this.api.post<LoginResponse>('auth/login', { email, password }).pipe(
-      tap(({ accessToken }) => {
+      tap(({ accessToken, name }) => {
         this._isAuthenticated.set(accessToken);
         localStorage.setItem('accessToken', accessToken);
+        if (name) {
+          this._userName.set(name);
+          localStorage.setItem('userName', name);
+        }
       }),
       catchError((error) => {
         console.error('Login failed', error);
@@ -34,10 +41,14 @@ export class AuthService {
     return this.api
       .post<LoginResponse>('auth/register', { name, email, password })
       .pipe(
-        tap(({ accessToken }) => {
+        tap(({ accessToken, name: userName }) => {
           if (accessToken) {
             this._isAuthenticated.set(accessToken);
             localStorage.setItem('accessToken', accessToken);
+            if (userName) {
+              this._userName.set(userName);
+              localStorage.setItem('userName', userName);
+            }
           }
         }),
         catchError((error: HttpErrorResponse) => {
@@ -49,10 +60,16 @@ export class AuthService {
 
   logout() {
     this._isAuthenticated.set(null);
+    this._userName.set(null);
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('userName');
   }
 
   getAccessToken(): string | null {
     return this._isAuthenticated();
+  }
+
+  getUserName(): string | null {
+    return this._userName();
   }
 }

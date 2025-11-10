@@ -10,6 +10,5 @@ import { AuthService } from '@core/auth/service/auth.service';
 })
 export class TrainerComponent {
   private auth = inject(AuthService);
-  // readonly name = computed(() => this.auth.user()?.name ?? 'Trainer');
-  readonly name = computed(() => 'Trainer');
+  readonly name = computed(() => this.auth.getUserName() ?? 'Trainer');
 }
