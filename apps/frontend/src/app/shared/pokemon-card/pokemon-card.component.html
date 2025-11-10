@@ -8,5 +8,19 @@
   />
   <h3>{{ pokemon.name }}</h3>
   <p><strong>Type:</strong> {{ pokemon.type }}</p>
-  <p class="description">{{ pokemon.description }}</p>
+
+  <div class="actions">
+    <button
+      class="btn-own"
+      (click)="toggleOwnership()"
+      [disabled]="pokemonService.loading()"
+      [class.owned]="pokemon.owned"
+    >
+      {{ pokemon.owned ? "Release" : "Catch" }}
+    </button>
+
+    <button class="btn-details" (click)="goToPokemonPage()">
+      View Details
+    </button>
+  </div>
 </div>

@@ -12,18 +12,41 @@ export class OwnershipService {
   }
 
   async toggleOwned(userId: string, pokemonId: number) {
-    const alreadyOwned = await this.repo.isOwned(userId, pokemonId);
+    try {
+      const alreadyOwned = await this.repo.isOwned(userId, pokemonId);
 
-    if (alreadyOwned) {
-      await this.repo.release(userId, pokemonId);
-      return { owned: false, updated: [pokemonId] };
+      if (alreadyOwned) {
+        await this.repo.release(userId, pokemonId);
+        return { owned: false, updated: [pokemonId] };
+      }
+
+      const preEvos = findPreEvolutions(pokemonId, this.evoMap);
+      const toInsert = [pokemonId, ...preEvos];
+
+      // Validate that all Pokemon IDs exist in the evolution map
+      const invalidIds = toInsert.filter((id) => !this.evoMap[id]);
+      if (invalidIds.length > 0) {
+        console.warn(`Invalid Pokemon IDs found: ${invalidIds.join(", ")}`);
+        // Filter out invalid IDs before inserting
+        const validIds = toInsert.filter((id) => this.evoMap[id]);
+        if (validIds.length === 0) {
+          throw new Error(
+            `No valid Pokemon IDs to insert for Pokemon #${pokemonId}`,
+          );
+        }
+        await this.repo.addMany(userId, validIds);
+        return { owned: true, updated: validIds };
+      }
+
+      await this.repo.addMany(userId, toInsert);
+      return { owned: true, updated: toInsert };
+    } catch (error) {
+      console.error(
+        `Error in toggleOwned for userId=${userId}, pokemonId=${pokemonId}:`,
+        error,
+      );
+      throw error;
     }
-
-    const preEvos = findPreEvolutions(pokemonId, this.evoMap);
-    const toInsert = [pokemonId, ...preEvos];
-    await this.repo.addMany(userId, toInsert);
-
-    return { owned: true, updated: toInsert };
   }
 
   async getUserOwned(userId: string) {

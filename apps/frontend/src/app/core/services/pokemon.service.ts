@@ -3,6 +3,7 @@ import { ApiService } from '@core/api/api.service';
 import {
   QueryParams,
   type Pokemon,
+  type PokemonSummary,
   type PokemonPageResponse,
 } from './pokemon.model';
 import { BehaviorSubject, Observable, of, switchMap, tap } from 'rxjs';
@@ -14,7 +15,7 @@ export class PokemonService {
 
   // State
   loading = signal(false);
-  pokemons = signal<Pokemon[]>([]);
+  pokemons = signal<PokemonSummary[]>([]);
   totalPages = signal(1);
   totalCount = signal(0);
   currentpage = signal(1);
@@ -64,6 +65,36 @@ export class PokemonService {
         tap((res) => {
           this.loading.set(false);
           this.cache.set(query, res);
+        }),
+      );
+  }
+
+  toggleOwnership(id: number) {
+    return this.api
+      .post<{
+        owned: boolean;
+        updated: number[];
+      }>(`me/collection/${id}/toggle`, {})
+      .pipe(
+        tap({
+          next: ({ owned, updated }) => {
+            this.loading.set(false);
+            this.pokemons.update((list) =>
+              list.map((p) => (updated.includes(p.id) ? { ...p, owned } : p)),
+            );
+            [...this.cache.entries()].forEach(([k, v]) =>
+              this.cache.set(k, {
+                ...v,
+                data: v.data.map((p) =>
+                  updated.includes(p.id) ? { ...p, owned } : p,
+                ),
+              }),
+            );
+          },
+          error: (err) => {
+            this.loading.set(false);
+            console.error('Toggle ownership failed', err);
+          },
         }),
       );
   }

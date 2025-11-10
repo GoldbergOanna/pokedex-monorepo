@@ -26,7 +26,7 @@ const evoMap = buildEvolutionMap(pokemonsJson);
 const ownershipService = new OwnershipService(evoMap);
 
 //ownership service for all routes
-collectionRoutes.use("*", async (c, next) => {
+app.use("*", async (c, next) => {
   c.set("ownershipService", ownershipService);
   await next();
 });

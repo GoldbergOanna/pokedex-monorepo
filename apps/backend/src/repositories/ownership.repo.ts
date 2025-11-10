@@ -16,12 +16,19 @@ export class OwnershipRepository {
   //Add multiple Pokémon as owned by the user at once
   async addMany(userId: string, pokemonIds: number[]): Promise<void> {
     if (!pokemonIds.length) return;
-    const values = pokemonIds.map((id) => `('${userId}', ${id})`).join(",");
-    await dbPool.query(`
+
+    // Use parameterized queries to prevent SQL injection
+    const values = pokemonIds.map((_, i) => `($1, $${i + 2})`).join(",");
+    const params = [userId, ...pokemonIds];
+
+    await dbPool.query(
+      `
       INSERT INTO owned_pokemon (user_id, pokemon_id)
       VALUES ${values}
       ON CONFLICT DO NOTHING;
-    `);
+    `,
+      params,
+    );
   }
 
   //Remove one Pokémon from the user's ownership
