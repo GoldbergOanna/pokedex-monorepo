@@ -15,7 +15,7 @@ export const routes: Routes = [
   },
   {
     path: 'pokedex',
-    canActivate: [() => inject(AuthGuard).canActivate()],
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('@pages/pokedex/pokedex.component').then(
         (m) => m.PokedexComponent,
