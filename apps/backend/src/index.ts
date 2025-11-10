@@ -16,7 +16,6 @@ app.route("/auth", authRoutes);
 app.route("/pokedex", pokedexRoutes);
 
 const port = Number(process.env.PORT ?? 3000);
-
 console.log(`Server is running on http://localhost:${port}`);
 
 serve({ fetch: app.fetch, port });

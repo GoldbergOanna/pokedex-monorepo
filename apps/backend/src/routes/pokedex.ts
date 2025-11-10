@@ -1,8 +1,12 @@
 import { Hono } from "hono";
 import { dbPool } from "../db";
 import { z } from "zod";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
 export const pokedexRoutes = new Hono();
+
+//require authentication for all pokedex routes
+pokedexRoutes.use("*", authMiddleware);
 
 const PokemonQuerySchema = z.object({
   page: z
