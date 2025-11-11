@@ -343,12 +343,34 @@ Once all containers are running, open your browser and navigate to `http://local
 
 ## API Endpoints
 
+### Authentication
+
 - `POST /auth/register` - Register a new user
+  - Body: `{ username: string, password: string }`
+  - Returns: `{ accessToken: string, name: string }`
+
 - `POST /auth/login` - Authenticate user and receive JWT token
-- `GET /pokedex` - Get paginated list of Pokémon with filters (search, type, tier, description)
+  - Body: `{ username: string, password: string }`
+  - Returns: `{ accessToken: string, name: string }`
+
+### Pokémon Data
+
+- `GET /pokedex` - Get paginated list of Pokémon with filters
+  - Query params: `page`, `limit`, `search`, `type`, `tier`, `description`
+  - Returns: `{ data: PokemonSummary[], page: number, totalPages: number, totalCount: number }`
+  - Results are cached on the client side for improved performance
+
 - `GET /pokedex/:id` - Get detailed information about a specific Pokémon
+  - Returns: Full Pokémon details including stats, evolution chain, and profile
+
+### Collection Management
 - `GET /me/collection` - Get list of Pokémon IDs owned by the authenticated user
+  - Returns: `{ ownedPokemonIds: number[] }` -- not yet added to the UI but implemented.
+
 - `POST /me/collection/:pokemonId/toggle` - Toggle ownership status of a Pokémon
+  - Returns: `{ owned: boolean, updated: number[] }`
+  - The `updated` array contains all Pokémon IDs that were affected (includes pre-evolutions when catching evolved forms)
+  - **Client-side cache update**: The frontend automatically updates all cached pages to reflect ownership changes in real-time without requiring a full page reload
 
 ## Development
 
