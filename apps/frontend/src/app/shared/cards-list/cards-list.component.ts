@@ -1,4 +1,4 @@
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { formToSignal } from '@shared/form.utils';
@@ -27,19 +27,29 @@ export class CardsListComponent {
   page = this.pokemonService.currentpage;
   totalPages = this.pokemonService.totalPages;
 
-  //debounce value changes to signal
+  // Sync filter changes to service query (debounced for better UX)
   private filtersSignal = formToSignal(this.filterForm);
 
-  private syncFiltersEffect = effect(() => {
-    const filters = this.filtersSignal();
-    if (filters) {
-      this.pokemonService.updateQuery({
-        ...filters,
-        page: 1,
-        limit: 20,
-      });
-    }
-  });
+  constructor() {
+    // Load initial data immediately, then react to filter changes
+    this.pokemonService.updateQuery({
+      ...untracked(this.filtersSignal),
+      page: 1,
+      limit: 20,
+    });
+
+    // React to subsequent filter changes
+    effect(() => {
+      const filters = this.filtersSignal();
+      if (filters) {
+        this.pokemonService.updateQuery({
+          ...filters,
+          page: 1,
+          limit: 20,
+        });
+      }
+    });
+  }
 
   previousPage() {
     if (this.page() > 1) {
