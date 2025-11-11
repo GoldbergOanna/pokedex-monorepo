@@ -305,7 +305,7 @@ pokedex/
 1. **Clone the repository**
 
 ```bash
-git clone [<repository-url>](https://github.com/GoldbergOanna/pokedex-monorepo.git)
+git clone https://github.com/GoldbergOanna/pokedex-monorepo.git
 cd pokedex
 ```
 
