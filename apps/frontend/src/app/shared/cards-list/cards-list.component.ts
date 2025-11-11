@@ -27,18 +27,15 @@ export class CardsListComponent {
   page = this.pokemonService.currentpage;
   totalPages = this.pokemonService.totalPages;
 
-  // Sync filter changes to service query (debounced for better UX)
   private filtersSignal = formToSignal(this.filterForm);
 
   constructor() {
-    // Load initial data immediately, then react to filter changes
     this.pokemonService.updateQuery({
       ...untracked(this.filtersSignal),
       page: 1,
       limit: 20,
     });
 
-    // React to subsequent filter changes
     effect(() => {
       const filters = this.filtersSignal();
       if (filters) {
