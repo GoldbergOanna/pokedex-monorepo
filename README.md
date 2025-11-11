@@ -298,14 +298,48 @@ pokedex/
 - Docker and Docker Compose
 - Node.js 18+ (for local development)
 - pnpm 8+ (install via `npm install -g pnpm`)
+- Git
 
-### Spinning up the project
+### Installation
+
+1. **Clone the repository**
+
+```bash
+git clone <repository-url>
+cd pokedex
+```
+
+2. **Install dependencies**
+
+```bash
+pnpm install
+```
+
+This will install all dependencies for the monorepo, including frontend, backend, and shared packages.
+
+3. **Set up environment variables** (optional)
+
+Copy the `.env.example` file to `.env` and configure if needed:
+
+```bash
+cp .env.example .env
+```
+
+### Running the project
+
+Start the backend, frontend, and database all together:
 
 ```bash
 pnpm dev
 ```
 
-This command starts the backend, frontend, and database all together.
+This command will:
+- Build and start the PostgreSQL database container
+- Build and start the backend API server on `http://localhost:3000`
+- Build and start the frontend development server on `http://localhost:4200`
+- Initialize the database with Pokemon data (first run only)
+
+Once all containers are running, open your browser and navigate to `http://localhost:4200` to use the application.
 
 ## API Endpoints
 
