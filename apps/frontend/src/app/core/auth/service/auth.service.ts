@@ -3,14 +3,12 @@ import { tap, catchError, throwError } from 'rxjs';
 import { ApiService } from '@core/api/api.service';
 import type { AuthResponse } from '@pokedex/shared-types';
 import { HttpErrorResponse } from '@angular/common/http';
-import { PokemonService } from '@core/services/pokemon.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly api = inject(ApiService);
-  private readonly pokemonService = inject(PokemonService);
 
   private readonly _isAuthenticated = signal<string | null>(
     localStorage.getItem('accessToken'),
@@ -30,7 +28,6 @@ export class AuthService {
           this._userName.set(name);
           localStorage.setItem('userName', name);
         }
-        this.pokemonService.clearCache();
       }),
       catchError((error) => {
         console.error('Login failed', error);
@@ -65,7 +62,6 @@ export class AuthService {
     this._userName.set(null);
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userName');
-    this.pokemonService.clearCache();
   }
 
   getAccessToken(): string | null {

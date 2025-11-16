@@ -55,9 +55,14 @@ export class PokemonService {
     return this.api
       .get<PokemonPageResponse>('pokedex', { params: httpParams })
       .pipe(
-        tap((res) => {
-          this.loading.set(false);
-          this.cache.set(query, res);
+        tap({
+          next: (res) => {
+            this.loading.set(false);
+            this.cache.set(query, res);
+          },
+          error: () => {
+            this.loading.set(false);
+          },
         }),
       );
   }
