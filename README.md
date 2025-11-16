@@ -306,7 +306,7 @@ pokedex/
 
 ```bash
 git clone https://github.com/GoldbergOanna/pokedex-monorepo.git
-cd pokedex
+cd pokedex-monorepo
 ```
 
 2. **Install dependencies**
