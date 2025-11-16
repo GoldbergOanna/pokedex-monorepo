@@ -1,27 +1,12 @@
 FROM node:22-alpine
 
-WORKDIR /app
-
 # Enable pnpm
 RUN corepack enable
 
-# Copy workspace config files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-
-# Copy shared types package
-COPY libs ./libs
-
-# Copy frontend package.json
-COPY apps/frontend/package.json ./apps/frontend/
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Copy frontend source
-COPY apps/frontend ./apps/frontend
-
-WORKDIR /app/apps/frontend
+WORKDIR /app
 
 EXPOSE 4200
 
-CMD ["pnpm", "run", "start"]
+# Note: Source code and dependencies will be mounted as volumes
+# This allows for hot-reload and works across all platforms
+CMD ["sh", "-c", "pnpm install && cd apps/frontend && pnpm start"]

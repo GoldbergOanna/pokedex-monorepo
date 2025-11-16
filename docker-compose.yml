@@ -38,6 +38,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      # Mount entire project for pnpm workspace support
+      - .:/app
+      # Use named volume for node_modules to avoid platform issues
+      - backend_node_modules:/app/node_modules
+      - backend_app_node_modules:/app/apps/backend/node_modules
 
   frontend:
     build:
@@ -49,6 +55,16 @@ services:
       - '4200:4200'
     depends_on:
       - backend
+    volumes:
+      # Mount entire project for pnpm workspace support
+      - .:/app
+      # Use named volume for node_modules to avoid platform issues
+      - frontend_node_modules:/app/node_modules
+      - frontend_app_node_modules:/app/apps/frontend/node_modules
 
 volumes:
   pg_data:
+  backend_node_modules:
+  backend_app_node_modules:
+  frontend_node_modules:
+  frontend_app_node_modules:
