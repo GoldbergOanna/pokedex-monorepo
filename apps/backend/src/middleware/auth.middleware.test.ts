@@ -86,12 +86,12 @@ describe("authMiddleware", () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it("should set user and call next if token is valid", async () => {
-    const decoded = { id: "user1", email: "test@example.com" };
+  it("should set userId and call next if token is valid", async () => {
+    const decoded = { userId: "user1" };
     (jwt.verify as jest.Mock).mockReturnValue(decoded);
     const c = createMockContext("Bearer validtoken");
     await authMiddleware(c, mockNext);
-    expect(c.set).toHaveBeenCalledWith("user", decoded);
+    expect(c.set).toHaveBeenCalledWith("userId", "user1");
     expect(mockNext).toHaveBeenCalled();
     expect(c.json).not.toHaveBeenCalled();
   });

@@ -6,7 +6,7 @@ module.exports = {
   preset: 'jest-preset-angular',
   setupFilesAfterEnv: ['<rootDir>/setup-jest.cjs'],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths || {}, {
-    prefix: '<rootDir>/src/',
+    prefix: '<rootDir>/',
   }),
   testEnvironment: 'jsdom',
   transformIgnorePatterns: [
