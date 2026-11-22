@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { dbPool } from "../db.ts";
+import { dbPool, isUniqueViolation } from "../db.ts";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
@@ -36,12 +36,6 @@ authRoutes.post("/register", async (c) => {
   const { name, email, password } = parsed.data;
 
   try {
-    const { rowCount } = await dbPool.query(
-      "SELECT id FROM users WHERE email = $1",
-      [email],
-    );
-    if (rowCount) return c.json({ error: "User already exists" }, 409);
-
     const hashedPassword = await bcrypt.hash(password, 10);
     const userId = nanoid();
 
@@ -56,6 +50,9 @@ authRoutes.post("/register", async (c) => {
     const response: AuthResponse = { accessToken, expiresIn: "1h", name };
     return c.json(response, 201);
   } catch (error) {
+    if (isUniqueViolation(error)) {
+      return c.json({ error: "User already exists" }, 409);
+    }
     console.error("Registration error:", error);
     return c.json({ error: "Internal server error" }, 500);
   }

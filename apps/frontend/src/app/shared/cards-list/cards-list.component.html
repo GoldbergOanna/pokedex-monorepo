@@ -3,19 +3,7 @@
 
   <select formControlName="type">
     <option value="">All Types</option>
-    @for (
-      type of [
-        "Fire",
-        "Water",
-        "Grass",
-        "Electric",
-        "Psychic",
-        "Normal",
-        "Rock",
-        "Ice",
-      ];
-      track type
-    ) {
+    @for (type of types; track type) {
       <option [value]="type">{{ type }}</option>
     }
   </select>

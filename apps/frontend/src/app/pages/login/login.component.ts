@@ -96,7 +96,7 @@ export class LoginComponent {
     action$.subscribe({
       next: () => this.router.navigate([successPath]),
       error: (error: HttpErrorResponse) => {
-        if (!isLogin && (error.status === 409 || error.status === 400)) {
+        if (!isLogin && error.status === 409) {
           // User already exists - show message and switch to login
           this.error.set(
             'This email is already registered. Please login instead.',
@@ -104,9 +104,11 @@ export class LoginComponent {
           setTimeout(() => {
             this.toggleMode();
           }, 2000);
+        } else if (!isLogin && error.status === 400) {
+          this.error.set('Please check your details and try again.');
         } else if (isLogin) {
           this.error.set(
-            'Login faild. Please check your credentials or create a new user.',
+            'Login failed. Please check your credentials or create a new user.',
           );
         } else {
           this.error.set('Registration failed. Please try again.');

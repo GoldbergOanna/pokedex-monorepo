@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { formToSignal } from '@shared/form.utils';
 import { PokemonCardComponent } from '@shared/pokemon-card/pokemon-card.component';
 import { PokemonService } from '@core/services/pokemon.service';
+import { POKEMON_TYPES } from '@shared/pokemon-types';
 
 @Component({
   selector: 'app-cards-list',
@@ -22,6 +23,7 @@ export class CardsListComponent {
     description: [''],
   });
 
+  readonly types = POKEMON_TYPES;
   pokemons = this.pokemonService.pokemons;
   loading = this.pokemonService.loading;
   page = this.pokemonService.currentpage;

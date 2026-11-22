@@ -1,4 +1,4 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PokemonService } from '@core/services/pokemon.service';
@@ -19,6 +19,10 @@ export class PokemonDetailsComponent {
   loading = signal(true);
   pokemon = signal<Pokemon | null>(null);
   owned = signal(false);
+  isToggling = computed(() => {
+    const id = this.pokemon()?.id;
+    return id !== undefined && this.service.isToggling(id);
+  });
 
   constructor() {
     effect(() => {
@@ -32,11 +36,7 @@ export class PokemonDetailsComponent {
     this.service.getById(id).subscribe({
       next: (data) => {
         this.pokemon.set(data);
-        // Check if owned from the service cache
-        const cachedPokemon = this.service.pokemons().find((p) => p.id === id);
-        if (cachedPokemon) {
-          this.owned.set(cachedPokemon.owned);
-        }
+        this.owned.set(data.owned);
         this.loading.set(false);
       },
       error: (err) => {

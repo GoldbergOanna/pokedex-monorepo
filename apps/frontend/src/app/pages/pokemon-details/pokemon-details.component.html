@@ -82,7 +82,7 @@
           <button
             class="btn-catch"
             (click)="toggleOwnership()"
-            [disabled]="service.loading()"
+            [disabled]="isToggling()"
             [class.owned]="owned()"
           >
             {{ owned() ? "Release" : "Catch" }}

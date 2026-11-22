@@ -14,7 +14,7 @@
     <button
       class="btn-own"
       (click)="toggleOwnership()"
-      [disabled]="pokemonService.loading()"
+      [disabled]="pokemonService.isToggling(pokemon.id)"
       [class.owned]="pokemon.owned"
     >
       {{ pokemon.owned ? "Release" : "Catch" }}

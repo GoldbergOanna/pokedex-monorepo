@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { dbPool } from "../db.ts";
-import { z } from "zod";
+import { pokemonIdSchema, pokemonListQuerySchema } from "../validation.ts";
 import { authMiddleware } from "../middleware/auth.middleware.ts";
 import type { AppVariables } from "../models/context.types.ts";
 
@@ -8,29 +8,12 @@ export const pokedexRoutes = new Hono<{ Variables: AppVariables }>();
 
 pokedexRoutes.use("*", authMiddleware);
 
-const PokemonQuerySchema = z.object({
-  page: z
-    .string()
-    .regex(/^\d+$/, "Page must be a number")
-    .transform((val) => parseInt(val, 10))
-    .default(1),
-  limit: z
-    .string()
-    .regex(/^\d+$/, "Limit must be a number")
-    .transform((val) => parseInt(val, 10))
-    .default(20),
-  search: z.string().optional(),
-  type: z.string().optional(),
-  tier: z.string().optional(),
-  description: z.string().optional(),
-});
-
 pokedexRoutes.get("/", async (c) => {
   try {
-    const parsed = PokemonQuerySchema.safeParse(c.req.query());
+    const parsed = pokemonListQuerySchema.safeParse(c.req.query());
     if (!parsed.success) {
       return c.json(
-        { error: "Invalid quesry params", details: parsed.error.flatten() },
+        { error: "Invalid query params", details: parsed.error.flatten() },
         400,
       );
     }
@@ -152,10 +135,20 @@ pokedexRoutes.get("/", async (c) => {
 
 pokedexRoutes.get("/:id", async (c) => {
   try {
-    const { id } = c.req.param();
+    const parsedId = pokemonIdSchema.safeParse(c.req.param("id"));
+    if (!parsedId.success) {
+      return c.json({ error: "Invalid Pokémon ID" }, 400);
+    }
+
     const pokemonRes = await dbPool.query(
-      "SELECT * FROM pokemon WHERE id = $1",
-      [id],
+      `
+      SELECT p.*, (op.user_id IS NOT NULL) AS owned
+      FROM pokemon p
+      LEFT JOIN owned_pokemon op
+        ON op.pokemon_id = p.id AND op.user_id = $2
+      WHERE p.id = $1
+      `,
+      [parsedId.data, c.get("userId")],
     );
 
     if (pokemonRes.rows.length === 0) {

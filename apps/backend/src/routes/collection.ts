@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middleware/auth.middleware.ts";
 import type { AppVariables } from "../models/context.types.ts";
+import { pokemonIdSchema } from "../validation.ts";
 
 export const collectionRoutes = new Hono<{ Variables: AppVariables }>();
 
@@ -21,10 +22,14 @@ collectionRoutes.post("/:pokemonId/toggle", async (c) => {
   try {
     const userId = c.get("userId");
     const ownershipService = c.get("ownershipService");
-    const pokemonId = Number(c.req.param("pokemonId"));
-
-    if (Number.isNaN(pokemonId) || pokemonId <= 0) {
+    const parsedId = pokemonIdSchema.safeParse(c.req.param("pokemonId"));
+    if (!parsedId.success) {
       return c.json({ error: "Invalid Pokémon ID" }, 400);
+    }
+
+    const pokemonId = parsedId.data;
+    if (!ownershipService.isKnownPokemon(pokemonId)) {
+      return c.json({ error: "Pokémon not found" }, 404);
     }
 
     const result = await ownershipService.toggleOwned(userId, pokemonId);

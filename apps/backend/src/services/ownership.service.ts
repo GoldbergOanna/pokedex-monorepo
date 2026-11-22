@@ -20,22 +20,7 @@ export class OwnershipService {
         return { owned: false, updated: [pokemonId] };
       }
 
-      const preEvos = findPreEvolutions(pokemonId, this.evoMap);
-      const toInsert = [pokemonId, ...preEvos];
-
-      const invalidIds = toInsert.filter((id) => !this.evoMap[id]);
-      if (invalidIds.length > 0) {
-        console.warn(`Invalid Pokemon IDs found: ${invalidIds.join(", ")}`);
-        const validIds = toInsert.filter((id) => this.evoMap[id]);
-        if (validIds.length === 0) {
-          throw new Error(
-            `No valid Pokemon IDs to insert for Pokemon #${pokemonId}`,
-          );
-        }
-        await this.repo.addMany(userId, validIds);
-        return { owned: true, updated: validIds };
-      }
-
+      const toInsert = [pokemonId, ...findPreEvolutions(pokemonId, this.evoMap)];
       await this.repo.addMany(userId, toInsert);
       return { owned: true, updated: toInsert };
     } catch (error) {
@@ -45,6 +30,10 @@ export class OwnershipService {
       );
       throw error;
     }
+  }
+
+  isKnownPokemon(pokemonId: number): boolean {
+    return pokemonId in this.evoMap;
   }
 
   async getUserOwned(userId: string) {

@@ -10,3 +10,11 @@ export const dbPool = new Pool({
   database: process.env.DB_NAME ?? "pokedex",
   max: 10,
 });
+
+const PG_UNIQUE_VIOLATION = "23505";
+
+export const isUniqueViolation = (error: unknown): boolean =>
+  typeof error === "object" &&
+  error !== null &&
+  "code" in error &&
+  error.code === PG_UNIQUE_VIOLATION;
