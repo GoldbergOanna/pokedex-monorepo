@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "packageManager": "pnpm@12.21.0",
   "description": "Full-stack Pokédex monorepo (Angular + Hono + PostgreSQL)",
   "scripts": {
     "dev": "docker compose up --build",

@@ -1,3 +1,12 @@
 packages:
   - "apps/*"
   - "libs/*"
+
+# Dependencies allowed to run install scripts (native builds / binaries)
+allowBuilds:
+  '@parcel/watcher': true
+  bcrypt: true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  unrs-resolver: true
