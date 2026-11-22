@@ -1,465 +1,99 @@
-# Pokédex Application
+<div align="center">
 
-A full-stack TypeScript monorepo application for browsing and collecting Pokémon. Built with Angular 19 (frontend), Hono.js (backend), PostgreSQL, and Docker.
+# ⚡ Pokédex
 
-## Table of Contents
+### A full-stack TypeScript monorepo for browsing and collecting Pokémon
 
-- [Features](#features)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [API Endpoints](#api-endpoints)
-- [Development](#development)
-- [AI Tool Usage](#ai-tool-usage)
+![Angular](https://img.shields.io/badge/Angular-19-DD0031?logo=angular&logoColor=white)
+![Hono](https://img.shields.io/badge/Hono-4-E36002?logo=hono&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-workspaces-F69220?logo=pnpm&logoColor=white)
 
-## Features
+</div>
 
-### Core Requirements (From Task)
+<p align="center">
+  <img src="docs/pokedex-list.png" alt="Pokédex list with search, type filter and catch/release" width="49%" />
+  <img src="docs/pokemon-details.png" alt="Pokémon details page" width="49%" />
+</p>
 
-✅ **Authentication System**
-- User registration with validation
-- JWT-based login (1-hour expiration)
-- Secure password hashing with bcrypt
-- Protected routes with auth guards and interceptors
+## Overview
 
-✅ **Pokémon Browsing**
-- Paginated list of all Pokémon (20 per page)
-- Search by name
-- Filter by type and name
-- Click to view detailed information
-- High-quality images and stats display
+Users sign up, browse more than 800 Pokémon with search, filters and pagination, and build a personal collection. The interesting part is the **evolution rule**: catching an evolved Pokémon (say, Charizard) automatically marks its earlier forms (Charmander and Charmeleon) as owned. The backend enforces this with a recursive walk of the evolution chain, and the frontend updates every cached page in place.
 
-✅ **Ownership Management**
-- Toggle Pokémon as owned/released with a single click
-- **Evolution rule**: Catching an evolved Pokémon automatically marks all pre-evolution forms as owned
-  - Example: Catching Charizard automatically marks Charmander and Charmeleon as owned
-  - Recursive evolution chain traversal handles complex multi-stage evolutions
-  - Backend enforces this rule to ensure data consistency
-- Real-time UI updates across cached pages (list and detail views stay in sync)
-- Personal collection view to track all owned Pokémon
-- Visual indicators (badges) on cards show ownership status at a glance
+## Highlights
 
-✅ **Architecture**
-- **Modular layered architecture** with clear separation of concerns
-- API layer (routes, controllers, validation)
-- Service layer (business logic, evolution management)
-- Repository layer (data access abstraction)
-- Dependency injection throughout backend
-- Standalone components in frontend (no NgModules)
-
-✅ **Database**
-- PostgreSQL 16 in Docker
-- Type-safe queries
-- Foreign key constraints
-- Efficient ownership tracking
-
-✅ **DevOps**
-- Full Docker Compose setup
-- One-command startup: `docker compose up`
-- Environment variable configuration
-- Database initialization script
-
-### Extra Features (Beyond Requirements)
-
-⭐ **Enhanced Type Safety**
-- Centralized type definitions in shared package (`@pokedex/shared-types`)
-- Strong typing across frontend and backend
-- Zod schema validation for API requests
-
-⭐ **Advanced Frontend Architecture**
-- Angular 19 with Signals for reactive state management
-- RxJS for async operations and caching
-- Smart/Dumb component pattern
-- HTTP interceptor with automatic token refresh on 401
-- Client-side caching for improved performance
-
-⭐ **Evolution Chain Visualization**
-- Complete evolution chain display on detail pages
-- Recursive evolution relationship mapping
-- Visual indicators for owned Pokémon in chain
-
-⭐ **Request Logging**
-- Structured logging for each HTTP request (method, path, status, duration)
-- Error tracking and debugging support
-
-⭐ **Code Quality**
-- ESLint + Prettier for consistent code style
-- Git hooks with Husky and lint-staged
-- Jest for unit testing
-- TypeScript strict mode enabled
+- **Monorepo with shared types.** The frontend and backend share one `@pokedex/shared-types` package, so the API contract is type-checked on both sides.
+- **Layered backend.** Routes → services → repositories, with dependency injection and Zod validation on every request.
+- **Secure auth.** bcrypt password hashing, JWTs, route guards, and an HTTP interceptor that handles 401s.
+- **Reactive frontend.** Angular 19 standalone components with Signals and RxJS, smart/presentational component split, and client-side caching that stays in sync after mutations.
+- **One-command dev environment.** `docker compose` brings up Postgres, the API and the UI, and seeds the database on first run.
+- **Code quality.** TypeScript strict mode everywhere, ESLint, Prettier, Husky with lint-staged, and Jest unit tests.
 
 ## Architecture
 
-### Backend Architecture (Hono.js)
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     HTTP Requests                            │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-                       ↓
-┌─────────────────────────────────────────────────────────────┐
-│  API Layer (Routes)                                          │
-│  • /auth/register, /auth/login                              │
-│  • /pokedex (list with filters), /pokedex/:id (detail)     │
-│  • /me/collection, /me/collection/:id/toggle                │
-│  • Zod validation, JWT middleware                           │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-                       ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Service Layer (Business Logic)                              │
-│  • PokemonService: data composition, evolution chains        │
-│  • OwnershipService: toggle logic, pre-evolution marking    │
-│  • Evolution utilities: recursive relationship traversal    │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-                       ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Repository Layer (Data Access)                              │
-│  • PokemonRepository: filtering, pagination                  │
-│  • OwnershipRepository: ownership queries                    │
-│  • Abstracted database access (easy to swap DB)             │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-                       ↓
-┌─────────────────────────────────────────────────────────────┐
-│  PostgreSQL Database                                         │
-│  • users, pokemon, owned_pokemon tables                      │
-└─────────────────────────────────────────────────────────────┘
+```text
+┌──────────────────────────┐        ┌──────────────────────────────────────┐
+│  Angular 19 SPA          │  HTTP  │  Hono API                            │
+│  • Signals + RxJS state  │ ─────► │  Routes      (Zod validation, JWT)   │
+│  • Auth guard/interceptor│  JSON  │     ↓                                │
+│  • Cached, synced pages  │        │  Services    (evolution logic)       │
+└──────────────────────────┘        │     ↓                                │
+             ▲                      │  Repositories (SQL data access)      │
+             │                      └──────────────────┬───────────────────┘
+             │  @pokedex/shared-types                  ↓
+             └──────────────────────────────── PostgreSQL 16
 ```
 
-**Key Design Patterns:**
-- **Dependency Injection**: Services receive dependencies via constructor
-- **Repository Pattern**: Data access abstracted from business logic
-- **Middleware Pattern**: Auth middleware injects userId into context
-- **Type Safety**: TypeScript interfaces and Zod validation throughout
-
-### Frontend Architecture (Angular 19)
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Pages (Smart Components)                                    │
-│  • LoginComponent: registration/login forms                  │
-│  • PokedexComponent: list with filters and pagination       │
-│  • PokemonDetailsComponent: detail view with evolution      │
-│  • TrainerComponent: user profile                           │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-                       ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Core Services (Singleton)                                   │
-│  • AuthService: login, registration, token management       │
-│  • PokemonService: reactive state with Signals + RxJS       │
-│  • ApiService: HTTP client wrapper                          │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-                       ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Shared Components (Dumb/Presentational)                     │
-│  • CardsListComponent: reusable paginated list               │
-│  • PokemonCardComponent: individual card UI                  │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-                       ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Guards & Interceptors                                       │
-│  • AuthGuard: route protection                               │
-│  • AuthInterceptor: token injection, 401 handling           │
-└─────────────────────────────────────────────────────────────┘
+```text
+apps/
+  backend/     Hono REST API: routes, services, repositories, middleware
+  frontend/    Angular 19 SPA: pages, core services, shared components
+libs/
+  shared-types/  Types shared by the frontend and backend
 ```
 
-**Key Design Patterns:**
-- **Standalone Components**: No NgModule overhead (Angular 19+)
-- **Reactive State Management**: Signals + RxJS BehaviorSubject
-- **Smart/Dumb Components**: Pages fetch data, shared components present
-- **Dependency Injection**: Angular DI for services
-- **Caching**: In-memory cache for API responses
+## Getting started
 
-## Project Structure
-
-```
-pokedex/
-├── apps/
-│   ├── backend/                 # Hono.js REST API
-│   │   ├── src/
-│   │   │   ├── index.ts         # Server entry point
-│   │   │   ├── db.ts            # PostgreSQL connection pool
-│   │   │   ├── init-db.ts       # Database initialization script
-│   │   │   ├── env.ts           # Environment variables
-│   │   │   ├── routes/          # API endpoints
-│   │   │   │   ├── auth.ts      # POST /auth/register, /auth/login
-│   │   │   │   ├── pokedex.ts   # GET /pokedex, /pokedex/:id
-│   │   │   │   └── collection.ts # GET/POST /me/collection
-│   │   │   ├── services/        # Business logic
-│   │   │   │   ├── pokemon.service.ts
-│   │   │   │   └── ownership.service.ts
-│   │   │   ├── repositories/    # Data access
-│   │   │   │   ├── pokemon.repo.ts
-│   │   │   │   └── ownership.repo.ts
-│   │   │   ├── middleware/      # HTTP middleware
-│   │   │   │   └── auth.middleware.ts
-│   │   │   ├── models/          # Context types
-│   │   │   │   └── context.types.ts
-│   │   │   ├── utils/           # Utilities
-│   │   │   │   ├── evolution.utils.ts
-│   │   │   │   └── evolution.map.ts
-│   │   │   └── data/
-│   │   │       └── Pokedex.json # Pokemon seed data
-│   │   ├── Dockerfile
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   │
-│   └── frontend/                # Angular 19 SPA
-│       ├── src/
-│       │   ├── app/
-│       │   │   ├── pages/       # Route components (smart)
-│       │   │   │   ├── login/
-│       │   │   │   ├── pokedex/
-│       │   │   │   ├── pokemon-details/
-│       │   │   │   └── trainer/
-│       │   │   ├── core/        # Singleton services
-│       │   │   │   ├── auth/
-│       │   │   │   │   ├── service/auth.service.ts
-│       │   │   │   │   ├── guard/auth.guard.ts
-│       │   │   │   │   └── interceptor/auth.interceptor.ts
-│       │   │   │   ├── services/
-│       │   │   │   │   └── pokemon.service.ts
-│       │   │   │   └── api/
-│       │   │   │       └── api.service.ts
-│       │   │   ├── shared/      # Reusable components (dumb)
-│       │   │   │   ├── cards-list/
-│       │   │   │   └── pokemon-card/
-│       │   │   ├── app.routes.ts
-│       │   │   └── app.config.ts
-│       │   └── environments/
-│       ├── Dockerfile
-│       ├── angular.json
-│       ├── package.json
-│       └── tsconfig.json
-│
-├── libs/
-│   └── shared-types/            # Shared TypeScript types
-│       ├── src/
-│       │   ├── pokemon.types.ts
-│       │   ├── auth.types.ts
-│       │   └── index.ts
-│       ├── package.json
-│       └── tsconfig.json
-│
-├── docker-compose.yml           # Container orchestration
-├── pnpm-workspace.yaml          # Monorepo configuration
-├── tsconfig.base.json           # Base TypeScript config
-├── package.json                 # Root workspace config
-├── .env.example                 # Environment variable template
-└── README.md                    # This file
-```
-
-## Tech Stack
-
-### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Hono.js 4.x
-- **Database**: PostgreSQL 16 (Docker)
-- **ORM**: Raw SQL with pg
-- **Authentication**: JWT (jsonwebtoken)
-- **Validation**: Zod 4.x
-- **Password Hashing**: bcrypt
-- **Pagination**: Server-side pagination with page and limit query params
-
-### Frontend
-
-- **Framework**: Angular 19
-- **State Management**: Angular Signals + RxJS
-- **HTTP Client**: Angular HttpClient
-- **Build Tool**: Vite (via Angular CLI)
-- **Styling**: SCSS
-- **Routing**: Angular Router with guards
-- **Caching**: Client-side caching for improved performance
-- **Auth**: JWT refresh on 401 via interceptor
-- **Pagination**: Client-side pagination handling with state management
-
-### DevOps & Tools
-
-- **Package Manager**: pnpm (workspaces)
-- **Containerization**: Docker + Docker Compose
-- **Linting**: ESLint + @typescript-eslint
-- **Formatting**: Prettier
-- **Git Hooks**: Husky + lint-staged
-- **Testing**: Jest (unit tests)
-- **TypeScript**: Strict mode enabled across the entire monorepo
-
-## Getting Started
-
-### Prerequisites
-
-- Docker and Docker Compose
-- Node.js 18+ (for local development)
-- pnpm 8+ (install via `npm install -g pnpm`)
-- Git
-
-### Installation
-
-1. **Clone the repository**
+**Prerequisites:** Docker, Node.js 18+, and pnpm 8+.
 
 ```bash
 git clone https://github.com/GoldbergOanna/pokedex-monorepo.git
 cd pokedex-monorepo
-```
-
-2. **Install dependencies**
-
-```bash
 pnpm install
+pnpm dev          # starts Postgres, the API on :3000, and the UI on :4200
 ```
 
-This will install all dependencies for the monorepo, including frontend, backend, and shared packages.
+Then open <http://localhost:4200>.
 
-3. **Set up environment variables** (optional)
+To run the backend outside Docker, copy `.env.example` to `.env` and adjust the values.
 
-Copy the `.env.example` file to `.env` and configure if needed:
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Build and start all services with Docker Compose |
+| `pnpm dev:down` | Stop everything and remove volumes |
+| `pnpm lint` / `pnpm format` | Lint and format the whole repo |
+| `pnpm --filter @pokedex/backend test` | Backend unit tests |
+| `pnpm --filter @pokedex/frontend test` | Frontend unit tests |
 
-```bash
-cp .env.example .env
-```
+## API
 
-### Running the project
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/auth/register` | Create an account and return a JWT |
+| `POST` | `/auth/login` | Log in and return a JWT |
+| `GET` | `/pokedex` | Paginated list. Query params: `page`, `limit`, `search`, `type` |
+| `GET` | `/pokedex/:id` | Full details, including stats and the evolution chain |
+| `GET` | `/me/collection` | IDs of the Pokémon the user owns |
+| `POST` | `/me/collection/:id/toggle` | Catch or release a Pokémon. Returns every affected ID, including pre-evolutions |
 
-Start the backend, frontend, and database all together:
+## Tech stack
 
-```bash
-pnpm dev
-```
-
-This command will:
-- Build and start the PostgreSQL database container
-- Build and start the backend API server on `http://localhost:3000`
-- Build and start the frontend development server on `http://localhost:4200`
-- Initialize the database with Pokemon data (first run only)
-
-Once all containers are running, open your browser and navigate to `http://localhost:4200` to use the application.
-
-## API Endpoints
-
-### Authentication
-
-- `POST /auth/register` - Register a new user
-  - Body: `{ username: string, password: string }`
-  - Returns: `{ accessToken: string, name: string }`
-
-- `POST /auth/login` - Authenticate user and receive JWT token
-  - Body: `{ username: string, password: string }`
-  - Returns: `{ accessToken: string, name: string }`
-
-### Pokémon Data
-
-- `GET /pokedex` - Get paginated list of Pokémon with filters
-  - Query params: `page`, `limit`, `search`, `type`, `tier`, `description`
-  - Returns: `{ data: PokemonSummary[], page: number, totalPages: number, totalCount: number }`
-  - Results are cached on the client side for improved performance
-
-- `GET /pokedex/:id` - Get detailed information about a specific Pokémon
-  - Returns: Full Pokémon details including stats, evolution chain, and profile
-
-### Collection Management
-- `GET /me/collection` - Get list of Pokémon IDs owned by the authenticated user
-  - Returns: `{ ownedPokemonIds: number[] }` -- not yet added to the UI but implemented.
-
-- `POST /me/collection/:pokemonId/toggle` - Toggle ownership status of a Pokémon
-  - Returns: `{ owned: boolean, updated: number[] }`
-  - The `updated` array contains all Pokémon IDs that were affected (includes pre-evolutions when catching evolved forms)
-  - **Client-side cache update**: The frontend automatically updates all cached pages to reflect ownership changes in real-time without requiring a full page reload
-
-## Development
-
-### Running Tests
-
-```bash
-# Backend tests
-cd apps/backend
-pnpm test
-
-# Frontend tests
-cd apps/frontend
-pnpm test
-```
-
-### Linting & Formatting
-
-```bash
-# Lint all files
-pnpm lint
-
-# Format all files
-pnpm format
-
-# Auto-fix linting issues
-pnpm lint:fix
-```
-
-### Building for Production
-
-```bash
-# Build backend
-cd apps/backend
-pnpm build
-
-# Build frontend
-cd apps/frontend
-pnpm build
-```
-
-### Database Management
-
-```bash
-# Re-initialize database (WARNING: drops all data)
-cd apps/backend
-pnpm run init-db
-
-# Connect to database
-docker compose exec db psql -U pokemon -d pokedex
-```
-
-## AI Tool Usage
-
-This project was developed with assistance from AI tools for the following tasks:
-
-### 1. **Unit Testing**
-- AI-assisted generation of Jest test suites for services and components
-- Test case design for authentication flows, ownership logic, and API endpoints
-- Mock data generation and test fixtures
-
-### 2. **CSS Styling**
-- Component styling with SCSS
-- Responsive layout design
-- Basic UI animations (hover effects, transitions)
-- Color scheme and visual consistency
-
-### 3. **Error Handling & Debugging**
-- Identifying and fixing TypeScript compilation errors
-- Resolving dependency conflicts
-- Debugging async/await issues in backend services
-- Fixing HTTP interceptor and guard issues in Angular
-
-### 4. **Code Generation**
-- Boilerplate code for Angular components and services
-- Repository pattern implementation
-- Zod validation schemas
-- Docker configuration files
-- Documentation
-
-**Important Notes:**
-- All AI-generated code has been reviewed, tested, and understood by the developer
-- AI was used as a productivity tool, not as a replacement for understanding
-- Core architecture decisions and business logic were designed by the developer
-- The developer can explain and modify any part of the codebase
-
-## License
-
-This project was created as a technical assessment for Monto.
+**Backend:** Node.js, Hono, PostgreSQL (`pg`), Zod, JWT, bcrypt
+**Frontend:** Angular 19, Signals, RxJS, SCSS
+**Tooling:** pnpm workspaces, Docker Compose, ESLint, Prettier, Husky, Jest
 
 ## Contact
 
-For questions or issues, please contact the repository owner.
+**Oana Goldberg**, senior full-stack engineer · [LinkedIn](https://www.linkedin.com/in/goldbergoana) · [GitHub](https://github.com/GoldbergOanna)

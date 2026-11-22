@@ -35,3 +35,6 @@ Thumbs.db
 # === Docker ===
 /docker-compose.override.yml
 *.pid
+
+# Keep the example env file
+!.env.example
